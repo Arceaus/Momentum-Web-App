@@ -13,6 +13,18 @@ const STORAGE_KEYS = {
   HISTORY: 'momentum_history_v12',
 };
 
+// Helper function to parse time estimate strings ("20m", "120m", "1h", "2.5h") into minutes
+export function parseMinutes(timeStr) {
+  if (!timeStr) return 20;
+  const str = timeStr.toString().toLowerCase().trim();
+  if (str.endsWith('h')) {
+    const hours = parseFloat(str.replace('h', ''));
+    return isNaN(hours) ? 60 : Math.round(hours * 60);
+  }
+  const mins = parseInt(str.replace(/[^0-9]/g, ''), 10);
+  return isNaN(mins) || mins <= 0 ? 20 : mins;
+}
+
 export function AppProvider({ children }) {
   // Live dynamic system date
   const now = new Date();

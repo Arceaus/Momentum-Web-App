@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp, parseMinutes } from '../context/AppContext';
 import GitHubContributionGraph from './GitHubContributionGraph';
-import { Plus, Trash2, Clock, Sparkles, CheckCircle2 } from 'lucide-react';
+import FocusTimerModal from './FocusTimerModal';
+import EarlyCompletionModal from './EarlyCompletionModal';
+import { Plus, Trash2, Clock, Sparkles, CheckCircle2, Play } from 'lucide-react';
 
 const CATEGORIES = ['Focus', 'Work', 'Creative', 'Personal', 'Health', 'Reading'];
+const DURATION_PRESETS = ['15m', '25m', '45m', '60m', '90m', '120m'];
 
 const CATEGORY_CLASSES = {
   Focus: 'badge-focus',
@@ -29,8 +32,12 @@ export default function TodayView() {
   const [isAdding, setIsAdding] = useState(false);
   const [titleInput, setTitleInput] = useState('');
   const [categoryInput, setCategoryInput] = useState('Focus');
-  const [timeInput, setTimeInput] = useState('20m');
+  const [timeInput, setTimeInput] = useState('25m');
   const [priorityInput, setPriorityInput] = useState('medium');
+
+  // Modals state
+  const [activeFocusTask, setActiveFocusTask] = useState(null);
+  const [earlyTaskGuard, setEarlyTaskGuard] = useState(null);
 
   const filteredTasks = tasks.filter((t) => {
     if (filterCategory === 'All') return true;
@@ -44,12 +51,38 @@ export default function TodayView() {
     addTask({
       title: titleInput,
       category: categoryInput,
-      timeEstimate: timeInput.trim() || '15m',
+      timeEstimate: timeInput.trim() || '25m',
       priority: priorityInput,
     });
 
     setTitleInput('');
     setIsAdding(false);
+  };
+
+  const handleCheckClick = (task) => {
+    if (task.completed) {
+      toggleTask(task.id);
+      return;
+    }
+
+    const minutes = parseMinutes(task.timeEstimate);
+    if (minutes >= 2) {
+      setEarlyTaskGuard({ task, remainingMinutes: minutes });
+    } else {
+      toggleTask(task.id);
+    }
+  };
+
+  const handleConfirmEarlyComplete = () => {
+    if (earlyTaskGuard) {
+      toggleTask(earlyTaskGuard.task.id);
+      setEarlyTaskGuard(null);
+    }
+  };
+
+  const handleFocusModalComplete = (task) => {
+    setActiveFocusTask(null);
+    toggleTask(task.id);
   };
 
   const allDone = totalTasksToday > 0 && completedTodayCount === totalTasksToday;
@@ -127,7 +160,7 @@ export default function TodayView() {
                 <button
                   type="button"
                   className={`custom-checkbox ${task.completed ? 'checked' : ''}`}
-                  onClick={() => toggleTask(task.id)}
+                  onClick={() => handleCheckClick(task)}
                   aria-label={`Mark task as ${task.completed ? 'incomplete' : 'complete'}`}
                 >
                   <svg className="check-icon" width="12" height="10" viewBox="0 0 12 10" fill="none">
@@ -136,11 +169,11 @@ export default function TodayView() {
                 </button>
 
                 {/* Task Title */}
-                <span className="task-title" onClick={() => toggleTask(task.id)}>
+                <span className="task-title" onClick={() => handleCheckClick(task)}>
                   {task.title}
                 </span>
 
-                {/* Category Badge & Meta */}
+                {/* Category Badge, Duration & Focus Action */}
                 <div className="task-meta">
                   <span className={`badge ${categoryClass}`}>
                     {task.category}
@@ -150,6 +183,18 @@ export default function TodayView() {
                       <Clock size={11} />
                       {task.timeEstimate}
                     </span>
+                  )}
+
+                  {/* Start Focus Clock Button */}
+                  {!task.completed && (
+                    <button
+                      type="button"
+                      className="btn-start-focus"
+                      onClick={() => setActiveFocusTask(task)}
+                      title="Start Real-Time Focus Clock"
+                    >
+                      <Play size={11} /> Focus
+                    </button>
                   )}
 
                   {/* Delete Button */}
@@ -179,6 +224,24 @@ export default function TodayView() {
             onChange={(e) => setTitleInput(e.target.value)}
             autoFocus
           />
+
+          {/* Flexible Duration Preset Pills & Custom Input */}
+          <div className="duration-picker-row">
+            <span className="picker-label"><Clock size={12} /> Target Focus Duration:</span>
+            <div className="duration-pills">
+              {DURATION_PRESETS.map((dur) => (
+                <button
+                  key={dur}
+                  type="button"
+                  className={`dur-pill ${timeInput === dur ? 'active' : ''}`}
+                  onClick={() => setTimeInput(dur)}
+                >
+                  {dur}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="add-task-options">
             <div className="selectors-group">
               <select
@@ -206,9 +269,10 @@ export default function TodayView() {
               <input
                 type="text"
                 className="time-input"
-                placeholder="20m"
+                placeholder="25m"
                 value={timeInput}
                 onChange={(e) => setTimeInput(e.target.value)}
+                title="Custom Duration (e.g. 35m, 180m, 2h)"
               />
             </div>
             <div className="action-buttons">
@@ -230,6 +294,25 @@ export default function TodayView() {
           <Plus size={18} />
           <span>Add task</span>
         </button>
+      )}
+
+      {/* Real-Time Focus Clock Modal */}
+      {activeFocusTask && (
+        <FocusTimerModal
+          task={activeFocusTask}
+          onClose={() => setActiveFocusTask(null)}
+          onCompleteTask={handleFocusModalComplete}
+        />
+      )}
+
+      {/* Early Completion Guard Confirmation Modal */}
+      {earlyTaskGuard && (
+        <EarlyCompletionModal
+          task={earlyTaskGuard.task}
+          remainingMinutes={earlyTaskGuard.remainingMinutes}
+          onConfirm={handleConfirmEarlyComplete}
+          onCancel={() => setEarlyTaskGuard(null)}
+        />
       )}
 
       {/* GitHub Contribution Graph on Home Page */}
@@ -343,7 +426,7 @@ export default function TodayView() {
         .task-meta {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
         .time-tag {
           display: inline-flex;
@@ -352,6 +435,26 @@ export default function TodayView() {
           font-size: 0.75rem;
           color: var(--text-muted);
           font-weight: 500;
+        }
+        .btn-start-focus {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: rgba(46, 160, 67, 0.15);
+          border: 1px solid var(--accent-border);
+          color: var(--accent-primary);
+          padding: 3px 10px;
+          border-radius: var(--radius-pill);
+          font-family: var(--font-heading);
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .btn-start-focus:hover {
+          background: var(--accent-secondary);
+          color: white;
+          box-shadow: 0 0 10px var(--accent-glow);
         }
         .delete-btn {
           background: transparent;
@@ -412,6 +515,51 @@ export default function TodayView() {
           background: transparent;
           color: var(--text-main);
         }
+        .duration-picker-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+          padding: 8px 0;
+          border-top: var(--border-light);
+        }
+        .picker-label {
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .duration-pills {
+          display: flex;
+          gap: 5px;
+          flex-wrap: wrap;
+        }
+        .dur-pill {
+          background: rgba(30, 36, 48, 0.6);
+          border: var(--border-glass);
+          color: var(--text-secondary);
+          padding: 3px 10px;
+          border-radius: var(--radius-pill);
+          font-family: var(--font-heading);
+          font-size: 0.775rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .dur-pill:hover {
+          background: var(--bg-hover);
+          color: var(--text-main);
+        }
+        .dur-pill.active {
+          background: var(--accent-secondary);
+          color: white;
+          border-color: var(--accent-primary);
+          box-shadow: 0 0 10px var(--accent-glow);
+        }
         .add-task-options {
           display: flex;
           align-items: center;
@@ -443,7 +591,7 @@ export default function TodayView() {
           color: #E6EDF3 !important;
         }
         .time-input {
-          width: 65px;
+          width: 70px;
           text-align: center;
         }
         .action-buttons {
