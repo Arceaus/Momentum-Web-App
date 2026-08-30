@@ -1,31 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { getDailyAtmosphere, getAtmosphereGreeting } from '../utils/atmosphere';
-import { Calendar, Trophy, Flame, Sparkles } from 'lucide-react';
+import { Calendar, Trophy, Flame, Sparkles, Clock } from 'lucide-react';
 
 export default function Header() {
   const { user, currentLevel, totalProductiveDays } = useApp();
   const [greeting, setGreeting] = useState('');
   const [atmosphere, setAtmosphere] = useState(getDailyAtmosphere());
 
+  // Live ticking date + time indicator (e.g. "Sunday, August 30 · 9:14 PM")
+  const [liveTimeString, setLiveTimeString] = useState(() => {
+    const now = new Date();
+    const datePart = now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    });
+    const timePart = now.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+    return `${datePart} · ${timePart}`;
+  });
+
   useEffect(() => {
     setGreeting(getAtmosphereGreeting(user.name));
     setAtmosphere(getDailyAtmosphere());
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      const datePart = now.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+      });
+      const timePart = now.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+      setLiveTimeString(`${datePart} · ${timePart}`);
+      setAtmosphere(getDailyAtmosphere());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [user.name]);
 
   const displayLevel = currentLevel < 10 ? `0${currentLevel}` : `${currentLevel}`;
 
-  // Live formatted date display (e.g. "Sunday, August 30, 2026")
-  const todayFormatted = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
-  });
-
   return (
     <header className="hero-header">
-      {/* Top Brand, Date & Atmosphere Bar */}
+      {/* Top Brand, Live Time & Atmosphere Bar */}
       <div className="brand-bar">
         <div className="logo-group">
           <div className="logo-icon-wrap">
@@ -34,9 +60,10 @@ export default function Header() {
           <span className="logo-text">MOMENTUM</span>
           <span className="logo-dot">•</span>
           
+          {/* Live Ticking Time Indicator Chip */}
           <div className="date-chip">
             <Calendar size={13} className="date-icon" />
-            <span>{todayFormatted}</span>
+            <span>{liveTimeString}</span>
           </div>
 
           {/* Subtly Styled Atmosphere Badge */}
