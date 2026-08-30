@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { getDailyQuote } from '../utils/quotes';
+import { getDailyAtmosphere, getAtmosphereGreeting } from '../utils/atmosphere';
 import { Calendar, Trophy, Flame, Sparkles } from 'lucide-react';
 
 export default function Header() {
   const { user, currentLevel, totalProductiveDays } = useApp();
   const [greeting, setGreeting] = useState('');
+  const [atmosphere, setAtmosphere] = useState(getDailyAtmosphere());
 
   useEffect(() => {
-    setGreeting(getDailyQuote(user.name));
+    setGreeting(getAtmosphereGreeting(user.name));
+    setAtmosphere(getDailyAtmosphere());
   }, [user.name]);
 
   const displayLevel = currentLevel < 10 ? `0${currentLevel}` : `${currentLevel}`;
@@ -23,7 +25,7 @@ export default function Header() {
 
   return (
     <header className="hero-header">
-      {/* Top Brand & Date Bar */}
+      {/* Top Brand, Date & Atmosphere Bar */}
       <div className="brand-bar">
         <div className="logo-group">
           <div className="logo-icon-wrap">
@@ -31,9 +33,16 @@ export default function Header() {
           </div>
           <span className="logo-text">MOMENTUM</span>
           <span className="logo-dot">•</span>
+          
           <div className="date-chip">
             <Calendar size={13} className="date-icon" />
             <span>{todayFormatted}</span>
+          </div>
+
+          {/* Subtly Styled Atmosphere Badge */}
+          <div className={`atmosphere-chip period-${atmosphere.period}`}>
+            <span>{atmosphere.iconSymbol}</span>
+            <span>{atmosphere.label}</span>
           </div>
         </div>
 
@@ -77,6 +86,7 @@ export default function Header() {
           display: flex;
           align-items: center;
           gap: 8px;
+          flex-wrap: wrap;
         }
         .logo-icon-wrap {
           width: 28px;
