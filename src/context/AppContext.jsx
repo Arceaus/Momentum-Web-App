@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { generateSeedActivityLog, INITIAL_TASKS, INITIAL_HISTORY_LOG, DEFAULT_USER, DEFAULT_SETTINGS } from '../utils/seedData';
 import { playCompletionSound } from '../utils/audio';
+import { dbSet, dbClear } from '../utils/db';
 import confetti from 'canvas-confetti';
 
 const AppContext = createContext();
@@ -69,25 +70,30 @@ export function AppProvider({ children }) {
     }
   }, [settings.accentTheme]);
 
-  // Sync to LocalStorage
+  // Dual Sync to LocalStorage & High-Performance IndexedDB Database
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+    dbSet('tasks', 'current', tasks);
   }, [tasks]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.ACTIVITY, JSON.stringify(activityLog));
+    dbSet('activity', 'current', activityLog);
   }, [activityLog]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+    dbSet('user', 'current', user);
   }, [user]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    dbSet('settings', 'current', settings);
   }, [settings]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(historyLog));
+    dbSet('history', 'current', historyLog);
   }, [historyLog]);
 
   // XP & Level calculations: Level 0 starts at 0 XP
@@ -312,6 +318,7 @@ export function AppProvider({ children }) {
     localStorage.removeItem(STORAGE_KEYS.USER);
     localStorage.removeItem(STORAGE_KEYS.SETTINGS);
     localStorage.removeItem(STORAGE_KEYS.HISTORY);
+    dbClear();
     setTasks(INITIAL_TASKS);
     setActivityLog(generateSeedActivityLog());
     setUser(DEFAULT_USER);
