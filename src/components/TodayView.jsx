@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp, parseMinutes } from '../context/AppContext';
+import { getRandomCompletionMessage } from '../utils/quotes';
 import GitHubContributionGraph from './GitHubContributionGraph';
 import FocusTimerModal from './FocusTimerModal';
 import EarlyCompletionModal from './EarlyCompletionModal';
@@ -86,6 +87,13 @@ export default function TodayView() {
   };
 
   const allDone = totalTasksToday > 0 && completedTodayCount === totalTasksToday;
+  const [completionMessage, setCompletionMessage] = useState(getRandomCompletionMessage());
+
+  useEffect(() => {
+    if (allDone) {
+      setCompletionMessage(getRandomCompletionMessage());
+    }
+  }, [allDone, completedTodayCount]);
 
   return (
     <div className="today-container">
@@ -121,10 +129,10 @@ export default function TodayView() {
       {/* Completion Celebration Banner */}
       {allDone && (
         <div className="completion-banner">
-          <Sparkles className="sparkle-icon" size={20} />
+          <Sparkles className="sparkle-icon" size={22} />
           <div>
-            <div className="banner-title">You're in peak momentum!</div>
-            <div className="banner-subtitle">All tasks completed for today. Take a restful break or add one more focus item.</div>
+            <div className="banner-title">{completionMessage.title}</div>
+            <div className="banner-subtitle">{completionMessage.subtitle}</div>
           </div>
         </div>
       )}
