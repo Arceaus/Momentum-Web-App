@@ -1,4 +1,4 @@
-// Seed data generator for Momentum 100% Clean Slate
+// Seed data generator for Momentum 100% Clean Slate & Un-onboarded Default State
 
 export function generateSeedActivityLog() {
   // Pure zero state: 0 contributions
@@ -12,17 +12,17 @@ export const INITIAL_TASKS = [];
 export const INITIAL_HISTORY_LOG = [];
 
 export const DEFAULT_USER = {
-  name: 'Sarthak',
-  avatar: 'S',
+  name: '',
+  avatar: '',
   level: 0,
-  totalXP: 0, // Level 00, 0 XP
-  hasOnboarded: true,
+  totalXP: 0,
+  hasOnboarded: false, // Default to un-onboarded so every new visitor enters their own name!
 };
 
 export const DEFAULT_SETTINGS = {
   dailyGoal: 5,
   soundEnabled: true,
-  soundPreset: 'chime', // Options: 'chime', 'bell', 'pop', 'success', 'marimba', 'custom'
+  soundPreset: 'chime',
   customSoundUri: null,
   customSoundName: null,
   accentTheme: 'mint',

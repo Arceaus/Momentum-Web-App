@@ -6,24 +6,12 @@ import confetti from 'canvas-confetti';
 const AppContext = createContext();
 
 const STORAGE_KEYS = {
-  TASKS: 'momentum_tasks_v11',
-  ACTIVITY: 'momentum_activity_v11',
-  USER: 'momentum_user_v11',
-  SETTINGS: 'momentum_settings_v11',
-  HISTORY: 'momentum_history_v11',
+  TASKS: 'momentum_tasks_v12',
+  ACTIVITY: 'momentum_activity_v12',
+  USER: 'momentum_user_v12',
+  SETTINGS: 'momentum_settings_v12',
+  HISTORY: 'momentum_history_v12',
 };
-
-// Helper function to parse time estimate strings ("20m", "120m", "1h", "2.5h") into minutes
-export function parseMinutes(timeStr) {
-  if (!timeStr) return 20;
-  const str = timeStr.toString().toLowerCase().trim();
-  if (str.endsWith('h')) {
-    const hours = parseFloat(str.replace('h', ''));
-    return isNaN(hours) ? 60 : Math.round(hours * 60);
-  }
-  const mins = parseInt(str.replace(/[^0-9]/g, ''), 10);
-  return isNaN(mins) || mins <= 0 ? 20 : mins;
-}
 
 export function AppProvider({ children }) {
   // Live dynamic system date
@@ -112,6 +100,11 @@ export function AppProvider({ children }) {
     showToast(`Welcome to Momentum, ${trimmed}!`, 'celebrate');
   };
 
+  const logoutUser = () => {
+    setUser(DEFAULT_USER);
+    showToast('Signed out of workspace', 'info');
+  };
+
   const addTask = (taskData) => {
     const newTask = {
       id: `t-${Date.now()}`,
@@ -126,14 +119,14 @@ export function AppProvider({ children }) {
     showToast('Task added to Today', 'success');
   };
 
-  // Hybrid Effort Scoring toggleTask handler
+  // Clean un-nested toggleTask handler
   const toggleTask = (id) => {
     const targetTask = tasks.find((t) => t.id === id);
     if (!targetTask) return;
 
     const nextCompleted = !targetTask.completed;
     const minutes = parseMinutes(targetTask.timeEstimate);
-    const taskScore = 10 + minutes; // 10 base task pts + 1 pt per focus minute
+    const taskScore = 10 + minutes;
 
     // 1. Update Tasks State
     setTasks((prevTasks) =>
@@ -259,6 +252,7 @@ export function AppProvider({ children }) {
     showToast('Task removed');
   };
 
+  // Delete Date History AND reset GitHub contribution count AND deduct XP earned on that day
   const deleteDateHistory = (dateStr) => {
     const targetHistory = historyLog.find((h) => h.dateStr === dateStr);
     const countToDelete = targetHistory ? (targetHistory.completedCount || targetHistory.tasks.length) : 0;
@@ -308,7 +302,7 @@ export function AppProvider({ children }) {
     localStorage.removeItem(STORAGE_KEYS.HISTORY);
     setTasks(INITIAL_TASKS);
     setActivityLog(generateSeedActivityLog());
-    setUser({ ...DEFAULT_USER, level: 0, totalXP: 0 });
+    setUser(DEFAULT_USER);
     setSettings(DEFAULT_SETTINGS);
     setHistoryLog(INITIAL_HISTORY_LOG);
     showToast('Reset workspace to clean slate', 'info');
@@ -345,6 +339,7 @@ export function AppProvider({ children }) {
         totalProductiveDays,
         totalCompletedAllTime,
         onboardUser,
+        logoutUser,
         addTask,
         toggleTask,
         deleteTask,

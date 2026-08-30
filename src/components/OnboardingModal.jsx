@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Sparkles, ArrowRight, Terminal } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Lock } from 'lucide-react';
 
 export default function OnboardingModal() {
   const { user, onboardUser } = useApp();
@@ -14,132 +14,198 @@ export default function OnboardingModal() {
     onboardUser(nameInput.trim());
   };
 
+  const initialLetter = nameInput.trim() ? nameInput.trim().charAt(0).toUpperCase() : '?';
+
   return (
     <div className="onboarding-overlay">
       <div className="onboarding-card glass-card">
-        <div className="onboarding-icon">
-          <Terminal size={26} />
+        {/* Top Floating Glow Avatar */}
+        <div className="onboarding-avatar-circle">
+          <span className="avatar-letter">{initialLetter}</span>
         </div>
         
-        <h1 className="onboarding-title">Welcome to Momentum</h1>
-        <p className="onboarding-subtitle">Your soothing dark workspace with GitHub-style contribution tracking.</p>
+        <div className="onboarding-title-group">
+          <div className="security-tag">
+            <Lock size={12} /> PRIVATE DIGITAL WORKSPACE
+          </div>
+          <h1 className="onboarding-title">Welcome to Momentum</h1>
+          <p className="onboarding-subtitle">
+            A serene, dark workspace with GitHub-style contribution tracking. Enter your name to get started.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="onboarding-form">
-          <label className="onboarding-label">What should we call you?</label>
-          <input
-            type="text"
-            className="onboarding-input"
-            placeholder="Enter your name..."
-            value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
-            autoFocus
-            required
-          />
+          <div className="input-group">
+            <label className="onboarding-label">What is your name?</label>
+            <input
+              type="text"
+              className="onboarding-input"
+              placeholder="e.g. Sarthak, Alex, Maya..."
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              autoFocus
+              required
+            />
+          </div>
+
           <button type="submit" className="onboarding-btn">
-            Enter Workspace <ArrowRight size={16} />
+            <span>Unlock Workspace</span>
+            <ArrowRight size={16} />
           </button>
         </form>
+
+        <div className="onboarding-footer">
+          <ShieldCheck size={14} className="shield-icon" />
+          <span>Your data stays 100% private in your browser</span>
+        </div>
       </div>
 
       <style>{`
         .onboarding-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(1, 4, 9, 0.85);
-          backdrop-filter: blur(10px);
+          background: rgba(4, 8, 16, 0.88);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 1000;
+          z-index: 2000;
           animation: fadeIn 0.3s ease;
+          padding: 1rem;
         }
         .onboarding-card {
           max-width: 440px;
-          width: 90%;
+          width: 100%;
           text-align: center;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 1rem;
-          padding: 2.5rem 2rem;
-          background: #161B22;
-          border: 1px solid #30363D;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+          gap: 1.25rem;
+          padding: 2.75rem 2.25rem;
+          background: rgba(22, 27, 34, 0.75);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+          border-radius: var(--radius-lg);
         }
-        .onboarding-icon {
-          width: 54px;
-          height: 54px;
+        .onboarding-avatar-circle {
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
-          background: var(--accent-secondary);
+          background: var(--accent-gradient);
           color: white;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 0 16px var(--accent-glow);
+          box-shadow: 0 0 24px var(--accent-glow);
           margin-bottom: 4px;
+          transition: transform 0.2s var(--ease-spring);
+        }
+        .avatar-letter {
+          font-family: var(--font-heading);
+          font-weight: 800;
+          font-size: 1.65rem;
+        }
+        .onboarding-title-group {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        .security-tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          color: var(--accent-primary);
+          background: var(--accent-light);
+          padding: 3px 10px;
+          border-radius: var(--radius-pill);
+          border: 1px solid var(--accent-border);
         }
         .onboarding-title {
           font-family: var(--font-heading);
-          font-size: 1.75rem;
+          font-size: 1.85rem;
           font-weight: 700;
           color: var(--text-main);
+          letter-spacing: -0.02em;
         }
         .onboarding-subtitle {
           font-size: 0.875rem;
           color: var(--text-secondary);
           line-height: 1.5;
-          margin-bottom: 8px;
         }
         .onboarding-form {
           width: 100%;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 16px;
+        }
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          text-align: left;
         }
         .onboarding-label {
           font-size: 0.775rem;
           font-weight: 700;
-          color: var(--text-muted);
+          color: var(--text-secondary);
           text-transform: uppercase;
           letter-spacing: 0.06em;
         }
         .onboarding-input {
           width: 100%;
-          padding: 12px 18px;
+          padding: 13px 18px;
           border-radius: var(--radius-md);
-          border: 1px solid #30363D;
-          background: #0D1117;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          background: rgba(30, 36, 48, 0.7);
           font-family: var(--font-body);
-          font-size: 1rem;
+          font-size: 1.05rem;
           color: var(--text-main);
           outline: none;
           text-align: center;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+          transition: all 0.25s ease;
         }
         .onboarding-input:focus {
           border-color: var(--accent-primary);
-          box-shadow: 0 0 12px var(--accent-glow);
+          box-shadow: 0 0 16px var(--accent-glow);
+          background: rgba(35, 42, 56, 0.9);
         }
         .onboarding-btn {
           width: 100%;
-          padding: 12px;
+          padding: 13px;
           border-radius: var(--radius-pill);
           border: none;
           background: var(--accent-secondary);
           color: white;
           font-family: var(--font-heading);
-          font-size: 0.95rem;
+          font-size: 0.975rem;
           font-weight: 700;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          box-shadow: 0 4px 14px var(--accent-glow);
-          transition: all 0.2s ease;
+          box-shadow: 0 4px 18px var(--accent-glow);
+          transition: all 0.25s var(--ease-spring);
         }
         .onboarding-btn:hover {
           background: var(--accent-primary);
+          transform: translateY(-1px);
+        }
+        .onboarding-footer {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.775rem;
+          color: var(--text-muted);
+          margin-top: 4px;
+        }
+        .shield-icon {
+          color: var(--accent-primary);
         }
       `}</style>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { playCompletionSound } from '../utils/audio';
-import { Volume2, VolumeX, RotateCcw, Download, User, Sparkles, Music, Upload, Check, Play } from 'lucide-react';
+import { Volume2, VolumeX, RotateCcw, Download, User, Sparkles, Music, Upload, Check, Play, LogOut } from 'lucide-react';
 
 const SOUND_PRESETS = [
   { id: 'chime', label: '🔔 Zen Chime', desc: 'Serene dual-frequency chime' },
@@ -13,7 +13,7 @@ const SOUND_PRESETS = [
 ];
 
 export default function SettingsView() {
-  const { user, settings, updateUser, updateSettings, resetData, tasks, activityLog } = useApp();
+  const { user, settings, updateUser, updateSettings, resetData, logoutUser, tasks, activityLog } = useApp();
 
   const [name, setName] = useState(user.name);
   const [avatar, setAvatar] = useState(user.avatar || user.name.charAt(0));
@@ -225,11 +225,14 @@ export default function SettingsView() {
         </p>
 
         <div className="data-buttons">
+          <button type="button" className="btn-outline" onClick={logoutUser}>
+            <LogOut size={15} /> Sign Out / Switch Profile
+          </button>
           <button type="button" className="btn-outline" onClick={handleExportData}>
             <Download size={15} /> Export Workspace Backup
           </button>
           <button type="button" className="btn-outline danger" onClick={resetData}>
-            <RotateCcw size={15} /> Reset Demo Workspace
+            <RotateCcw size={15} /> Reset Workspace Slate
           </button>
         </div>
       </div>
