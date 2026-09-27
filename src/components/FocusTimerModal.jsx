@@ -446,12 +446,18 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
         @media (max-width: 480px) {
           .focus-instrument-card {
             padding: 1.35rem 1.15rem;
+            width: 94%;
           }
           .clock-digits {
-            font-size: 3.75rem;
+            font-size: clamp(2.85rem, 15vw, 3.75rem);
           }
           .instrument-controls-row {
             grid-template-columns: 1fr;
+            gap: 8px;
+          }
+          .control-btn {
+            min-height: 44px;
+            font-size: 0.85rem;
           }
         }
       `}</style>

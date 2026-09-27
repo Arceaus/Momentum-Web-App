@@ -345,12 +345,23 @@ export default function OnboardingModal() {
         }
 
         @media (max-width: 600px) {
+          .onboarding-scrim {
+            padding: 1rem;
+          }
           .onboarding-document {
-            padding: 1.5rem 1.25rem;
-            gap: 1.25rem;
+            padding: 1.5rem 1.15rem;
+            gap: 1.15rem;
           }
           .philosophy-title {
-            font-size: 1.55rem;
+            font-size: clamp(1.35rem, 5.5vw, 1.65rem);
+          }
+          .onboarding-input {
+            font-size: 1rem; /* Prevents unwanted iOS auto-zoom */
+            min-height: 44px;
+          }
+          .onboarding-submit-btn {
+            min-height: 44px;
+            font-size: 0.875rem;
           }
         }
       `}</style>

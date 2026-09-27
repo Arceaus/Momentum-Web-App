@@ -517,6 +517,58 @@ export default function GitHubContributionGraph() {
           color: var(--text-secondary);
           line-height: 1.45;
         }
+
+        @media (max-width: 680px) {
+          .chronicle-container {
+            padding: 1.15rem 1rem;
+            gap: 0.85rem;
+          }
+
+          .chronicle-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          }
+
+          .header-metrics {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .chronicle-grid-container {
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8px;
+          }
+
+          .chronicle-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          }
+
+          .legend-strip {
+            width: 100%;
+            justify-content: flex-start;
+          }
+
+          .inspector-panel {
+            padding: 1.25rem 1rem;
+            width: 94%;
+          }
+
+          .inspector-metrics-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+          }
+
+          .inspector-metric-box {
+            padding: 0.6rem 0.35rem;
+          }
+
+          .metric-val {
+            font-size: 1.15rem;
+          }
+        }
       `}</style>
     </div>
   );

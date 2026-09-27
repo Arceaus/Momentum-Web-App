@@ -551,6 +551,14 @@ export default function HistoryLogSection() {
             grid-template-columns: repeat(2, 1fr);
           }
 
+          .stat-metric-cell {
+            padding: 1rem 0.85rem;
+          }
+
+          .stat-large-val {
+            font-size: clamp(1.65rem, 6vw, 2.1rem);
+          }
+
           .stat-metric-cell:nth-child(2) {
             border-right: none;
           }
@@ -558,6 +566,19 @@ export default function HistoryLogSection() {
           .stat-metric-cell:nth-child(1),
           .stat-metric-cell:nth-child(2) {
             border-bottom: 1px solid var(--border-subtle);
+          }
+
+          .ledger-header {
+            padding: 1rem 1.15rem;
+          }
+
+          .archive-date-bar {
+            padding: 0.85rem 1rem;
+          }
+
+          .delete-record-btn {
+            min-width: 30px;
+            min-height: 30px;
           }
 
           .archive-task-row {

@@ -1042,38 +1042,131 @@ export default function TodayView() {
 
         /* Responsive Layout Adjustments */
         @media (max-width: 680px) {
+          .log-heading {
+            font-size: 1.15rem;
+          }
+
+          .custom-checkbox {
+            position: relative;
+            touch-action: manipulation;
+          }
+
+          .custom-checkbox::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+          }
+
           .ledger-entry {
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 0.85rem 1rem;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-rows: auto auto;
+            align-items: center;
+            padding: 0.85rem 0.95rem;
+            column-gap: 10px;
+            row-gap: 8px;
           }
 
           .entry-status-cell {
-            width: 100%;
+            grid-column: 1;
+            grid-row: 1;
+            align-self: center;
           }
 
           .entry-body-cell {
+            grid-column: 2;
+            grid-row: 1;
             width: 100%;
-            padding-left: 27px; /* Align flush with title under checkbox */
+            min-width: 0;
+            padding-left: 0;
           }
 
           .entry-meta-cell {
+            grid-column: 1 / -1;
+            grid-row: 2;
             width: 100%;
-            padding-left: 27px;
+            padding-left: 0;
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            padding-top: 4px;
+            padding-top: 6px;
             border-top: 1px dashed var(--border-subtle);
+            flex-wrap: wrap;
+            gap: 6px;
+          }
+
+          .entry-action-btn {
+            width: 32px;
+            height: 32px;
+          }
+
+          .btn-start-focus {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            min-height: 30px;
+          }
+
+          .category-filter-strip {
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .filter-btn {
+            min-height: 30px;
+            padding: 5px 10px;
+            font-size: 0.725rem;
           }
 
           .composer-controls-row {
             flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+          }
+
+          .controls-left {
+            width: 100%;
+            flex-direction: column;
             align-items: flex-start;
+            gap: 6px;
+          }
+
+          .duration-segmented {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+
+          .duration-btn {
+            flex: 1;
+            min-width: 36px;
+            text-align: center;
+            padding: 6px 4px;
+            font-size: 0.725rem;
           }
 
           .controls-right {
             width: 100%;
+            display: flex;
+            align-items: center;
             justify-content: space-between;
+            gap: 8px;
+            padding-top: 6px;
+            border-top: 1px dashed var(--border-subtle);
+          }
+
+          .select-control {
+            min-height: 34px;
+          }
+
+          .composer-primary-input {
+            font-size: 1rem !important; /* Prevents iOS auto-zoom */
+            min-height: 42px;
+          }
+
+          .btn-composer-submit, .btn-composer-cancel {
+            min-height: 34px;
+            padding: 6px 14px;
           }
         }
       `}</style>

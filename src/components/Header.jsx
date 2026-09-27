@@ -299,7 +299,8 @@ export default function Header() {
             border-top: 1px solid var(--border-subtle);
           }
           .editorial-greeting {
-            font-size: 1.75rem;
+            font-size: clamp(1.4rem, 6vw, 1.75rem);
+            word-break: break-word;
           }
           .masthead-tag {
             display: none;

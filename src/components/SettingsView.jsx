@@ -1070,15 +1070,32 @@ export default function SettingsView() {
         /* Responsive Layout */
         @media (max-width: 680px) {
           .settings-document-container {
-            padding: 1.5rem 1.15rem;
-            gap: 2rem;
+            padding: 1.25rem 1rem;
+            gap: 1.75rem;
+          }
+          .doc-title {
+            font-size: 1.45rem;
           }
           .section-body {
             padding-left: 0;
           }
+          .fields-grid {
+            grid-template-columns: 1fr;
+          }
+          .input-control {
+            font-size: 1rem !important; /* Prevents iOS auto-zoom */
+            min-height: 40px;
+          }
+          .presets-table {
+            grid-template-columns: 1fr;
+          }
+          .theme-selector-grid {
+            grid-template-columns: 1fr;
+          }
           .control-bar-row {
             flex-direction: column;
             align-items: flex-start;
+            gap: 10px;
           }
           .control-bar-actions {
             width: 100%;
@@ -1088,8 +1105,16 @@ export default function SettingsView() {
             flex-direction: column;
             align-items: stretch;
           }
-          .btn-action-secondary, .btn-action-danger {
+          .btn-action-primary,
+          .btn-action-secondary,
+          .btn-action-danger,
+          .btn-action-dashed {
+            min-height: 42px;
             justify-content: center;
+          }
+          .switch-segment {
+            min-height: 32px;
+            padding: 6px 12px;
           }
         }
       `}</style>
