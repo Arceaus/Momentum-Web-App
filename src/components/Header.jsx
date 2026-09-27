@@ -46,63 +46,53 @@ export default function Header() {
     return () => clearInterval(timer);
   }, []);
 
-  const displayLevel = currentLevel < 10 ? `0${currentLevel}` : `${currentLevel}`;
   const userInitial = user.avatar || (user.name ? user.name.charAt(0).toUpperCase() : 'M');
 
   return (
     <header className="workspace-header">
-      {/* Top Utilitarian Console Masthead */}
-      <div className="console-masthead">
-        {/* Left: Brand & Console Context */}
+      {/* Top Workspace Masthead */}
+      <div className="workspace-masthead">
+        {/* Left: Brand Identity */}
         <div className="masthead-left">
           <div className="brand-identity">
             <span className="brand-stamp" aria-hidden="true">M</span>
             <span className="brand-name">MOMENTUM</span>
           </div>
-          <span className="masthead-divider" aria-hidden="true">/</span>
-          <span className="masthead-tag">WORK CONSOLE</span>
         </div>
 
-        {/* Center: Live Time & Atmosphere Telemetry */}
+        {/* Center: Live Time */}
         <div className="masthead-center">
-          <div className="time-chip" title="Live system clock">
+          <div className="time-chip" title="Live clock">
             <Calendar size={12} className="meta-icon" />
             <span>{liveTimeString}</span>
           </div>
-
-          <div className={`atmosphere-chip period-${atmosphere.period}`} title="Current time-of-day focus state">
-            <span className="period-sym">{atmosphere.iconSymbol}</span>
-            <span>{atmosphere.label}</span>
-          </div>
         </div>
 
-        {/* Right: User Statistics & Profile Stamp */}
+        {/* Right: User Statistics & Profile Monogram */}
         <div className="masthead-right">
-          <div className="telemetry-badge level" title={`Experience Level ${currentLevel}`}>
+          <div className="header-stat-badge level" title={`Level ${currentLevel}`}>
             <Trophy size={12} className="badge-icon" />
-            <span>LVL {displayLevel}</span>
+            <span className="badge-txt">Lvl</span>
+            <span className="badge-num font-mono">{currentLevel}</span>
           </div>
 
           {totalProductiveDays > 0 && (
-            <div className="telemetry-badge streak" title={`${totalProductiveDays} productive days streak`}>
+            <div className="header-stat-badge streak" title={`${totalProductiveDays} day streak`}>
               <Flame size={12} className="badge-icon flame" />
-              <span>{totalProductiveDays}D</span>
+              <span className="badge-num font-mono">{totalProductiveDays}d</span>
+              <span className="badge-txt">streak</span>
             </div>
           )}
 
-          <div className="user-profile-stamp" title={`Workspace profile: ${user.name || 'Anonymous'}`}>
+          <div className="user-profile-stamp" title={`Profile: ${user.name || 'Anonymous'}`}>
             <span>{userInitial}</span>
           </div>
         </div>
       </div>
 
-      {/* Editorial Greeting Header (Quiet, Integrated, Non-Floating) */}
+      {/* Editorial Greeting Header */}
       <div className="editorial-banner">
-        <div className="editorial-meta-row">
-          <span className="editorial-eyebrow">
-            MOMENTUM CONSOLE · {atmosphere.label.toUpperCase()}
-          </span>
-        </div>
+        <span className="editorial-eyebrow">{atmosphere.label}</span>
         <h1 className="editorial-greeting">
           {greeting}
         </h1>
@@ -112,12 +102,12 @@ export default function Header() {
         .workspace-header {
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
+          gap: 1.25rem;
           width: 100%;
         }
 
-        /* Top Utilitarian Masthead Bar */
-        .console-masthead {
+        /* Top Masthead Bar */
+        .workspace-masthead {
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -149,7 +139,7 @@ export default function Header() {
           height: 20px;
           background: var(--text-primary);
           color: var(--text-inverse);
-          font-family: var(--font-mono);
+          font-family: var(--font-heading);
           font-size: 0.725rem;
           font-weight: 700;
           border-radius: var(--radius-xs);
@@ -162,20 +152,6 @@ export default function Header() {
           font-weight: 800;
           letter-spacing: 0.12em;
           color: var(--text-primary);
-        }
-
-        .masthead-divider {
-          color: var(--border-base);
-          font-size: 0.75rem;
-          font-family: var(--font-mono);
-        }
-
-        .masthead-tag {
-          font-family: var(--font-mono);
-          font-size: 0.675rem;
-          font-weight: 500;
-          letter-spacing: 0.08em;
-          color: var(--text-muted);
         }
 
         .masthead-center {
@@ -201,23 +177,18 @@ export default function Header() {
           color: var(--text-muted);
         }
 
-        .period-sym {
-          font-size: 0.75rem;
-          line-height: 1;
-        }
-
         .masthead-right {
           display: flex;
           align-items: center;
           gap: 6px;
         }
 
-        .telemetry-badge {
+        .header-stat-badge {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          font-family: var(--font-mono);
-          font-size: 0.7rem;
+          font-family: var(--font-heading);
+          font-size: 0.725rem;
           font-weight: 600;
           padding: 3px 7px;
           border-radius: var(--radius-xs);
@@ -226,14 +197,25 @@ export default function Header() {
           color: var(--text-secondary);
         }
 
-        .telemetry-badge.level {
+        .header-stat-badge.level {
           color: var(--text-primary);
         }
 
-        .telemetry-badge.streak {
+        .header-stat-badge.streak {
           background: var(--accent-light);
           color: var(--accent);
           border-color: var(--accent-border);
+        }
+
+        .badge-num {
+          font-family: var(--font-mono);
+          font-weight: 600;
+        }
+
+        .badge-txt {
+          font-size: 0.7rem;
+          font-weight: 500;
+          opacity: 0.85;
         }
 
         .badge-icon.flame {
@@ -249,8 +231,8 @@ export default function Header() {
           background: var(--bg-subtle);
           border: 1px solid var(--border);
           border-radius: var(--radius-xs);
-          font-family: var(--font-mono);
-          font-size: 0.7rem;
+          font-family: var(--font-heading);
+          font-size: 0.725rem;
           font-weight: 700;
           color: var(--text-primary);
         }
@@ -259,22 +241,17 @@ export default function Header() {
         .editorial-banner {
           display: flex;
           flex-direction: column;
-          gap: 6px;
-          padding: 1.25rem 0.25rem 0.5rem 0.25rem;
-          border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .editorial-meta-row {
-          display: flex;
-          align-items: center;
+          gap: 4px;
+          padding: 0.75rem 0.25rem 0.25rem 0.25rem;
         }
 
         .editorial-eyebrow {
-          font-family: var(--font-mono);
-          font-size: 0.6875rem;
+          font-family: var(--font-heading);
+          font-size: 0.75rem;
           font-weight: 600;
-          letter-spacing: 0.08em;
-          color: var(--text-muted);
+          letter-spacing: var(--tracking-wide);
+          text-transform: uppercase;
+          color: var(--accent);
         }
 
         .editorial-greeting {
@@ -288,25 +265,19 @@ export default function Header() {
         }
 
         @media (max-width: 680px) {
-          .console-masthead {
+          .workspace-masthead {
             padding: 0.5rem 0.65rem;
           }
           .masthead-center {
             order: 3;
             width: 100%;
-            justify-content: space-between;
+            justify-content: center;
             padding-top: 6px;
             border-top: 1px solid var(--border-subtle);
           }
           .editorial-greeting {
             font-size: clamp(1.4rem, 6vw, 1.75rem);
             word-break: break-word;
-          }
-          .masthead-tag {
-            display: none;
-          }
-          .masthead-divider {
-            display: none;
           }
         }
       `}</style>

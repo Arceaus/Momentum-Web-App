@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
+import { Check, Sparkles } from 'lucide-react';
 
 export default function Toast() {
   const { toast } = useApp();
@@ -10,7 +11,9 @@ export default function Toast() {
 
   return (
     <div className={`toast-notification ${isCelebrate ? 'toast-celebrate' : 'toast-info'}`} role="status">
-      <span className="toast-tag">{isCelebrate ? '[CELEBRATION]' : '[STATUS]'}</span>
+      <span className="toast-icon">
+        {isCelebrate ? <Sparkles size={14} /> : <Check size={14} />}
+      </span>
       <span className="toast-body">{toast.message}</span>
 
       <style>{`
@@ -21,11 +24,12 @@ export default function Toast() {
           transform: translateX(-50%);
           background: var(--text-primary);
           color: var(--text-inverse);
-          border: 1px solid var(--border-strong);
-          border-radius: var(--radius-sm);
+          border: 1px solid var(--text-primary);
+          border-radius: var(--radius-xs);
           padding: 8px 16px;
-          font-family: var(--font-mono);
-          font-size: 0.8rem;
+          font-family: var(--font-heading);
+          font-size: 0.8125rem;
+          font-weight: 500;
           box-shadow: var(--shadow-modal);
           z-index: 2500;
           display: flex;
@@ -40,19 +44,17 @@ export default function Toast() {
           border-left: 3px solid var(--accent);
         }
 
-        .toast-tag {
-          font-size: 0.7rem;
+        .toast-icon {
           color: var(--accent);
-          font-weight: 700;
-          letter-spacing: 0.05em;
+          display: flex;
+          align-items: center;
         }
 
-        .toast-celebrate .toast-tag {
-          color: #E5835F;
+        .toast-celebrate .toast-icon {
+          color: var(--accent);
         }
 
         .toast-body {
-          font-weight: 500;
           letter-spacing: 0.01em;
         }
 

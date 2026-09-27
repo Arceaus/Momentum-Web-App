@@ -10,9 +10,9 @@ const CATEGORIES = ['Focus', 'Work', 'Creative', 'Personal', 'Health', 'Reading'
 const DURATION_PRESETS = ['15m', '25m', '45m', '60m', '90m', '120m'];
 
 const PRIORITY_CONFIG = {
-  high: { label: 'P1', full: 'High', color: 'var(--danger)' },
-  medium: { label: 'P2', full: 'Med', color: 'var(--warning)' },
-  low: { label: 'P3', full: 'Low', color: 'var(--success)' },
+  high: { label: 'High', color: 'var(--danger)' },
+  medium: { label: 'Med', color: 'var(--warning)' },
+  low: { label: 'Low', color: 'var(--success)' },
 };
 
 export default function TodayView() {
@@ -123,30 +123,39 @@ export default function TodayView() {
     toggleTask(task.id);
   };
 
+  // Group tasks by category when All is selected
+  const categoriesToRender = filterCategory === 'All'
+    ? CATEGORIES.filter((cat) => filteredTasks.some((t) => t.category === cat))
+    : [filterCategory];
+
+  // Capture any tasks with custom/missing category
+  const uncategorizedTasks = filterCategory === 'All'
+    ? filteredTasks.filter((t) => !CATEGORIES.includes(t.category))
+    : [];
+
   return (
     <div className="work-log-container">
       {/* ---------------------------------------------------------------------
-         1. Work Log Control Bar & Metrics Header
+         1. Today Header & Controls
          --------------------------------------------------------------------- */}
       <section className="work-log-header">
         <div className="header-meta-group">
           <div className="log-title-row">
-            <h2 className="log-heading">Daily Work Log</h2>
-            <span className="log-rule-tag">TODAY</span>
+            <h2 className="log-heading">Today</h2>
+            <span className="log-count-text">
+              {totalTasksToday === 0
+                ? 'No tasks'
+                : `${completedTodayCount} of ${totalTasksToday} completed`}
+            </span>
           </div>
 
-          {/* Numerical Progress Indicator */}
-          <div className="progress-telemetry">
-            <div className="telemetry-figures">
-              <span className="figure-completed">{String(completedTodayCount).padStart(2, '0')}</span>
-              <span className="figure-slash">/</span>
-              <span className="figure-total">{String(totalTasksToday).padStart(2, '0')}</span>
-              <span className="figure-label">COMPLETED</span>
+          {/* Simple Clean Progress Counter */}
+          {totalTasksToday > 0 && (
+            <div className="log-progress-stats">
+              <span className="log-stat-num font-mono">{completedTodayCount} / {totalTasksToday}</span>
+              <span className="log-stat-pct font-mono">({progressPercent}%)</span>
             </div>
-            {totalTasksToday > 0 && (
-              <span className="percent-stamp">[{progressPercent}%]</span>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Category Segmented Strip */}
@@ -156,7 +165,7 @@ export default function TodayView() {
             className={`filter-btn ${filterCategory === 'All' ? 'active' : ''}`}
             onClick={() => setFilterCategory('All')}
           >
-            All <span className="filter-count">{tasks.length}</span>
+            All <span className="filter-count font-mono">{tasks.length}</span>
           </button>
           {CATEGORIES.map((cat) => {
             const count = tasks.filter((t) => t.category === cat).length;
@@ -168,14 +177,14 @@ export default function TodayView() {
                 onClick={() => setFilterCategory(cat)}
               >
                 {cat}
-                {count > 0 && <span className="filter-count">{count}</span>}
+                {count > 0 && <span className="filter-count font-mono">{count}</span>}
               </button>
             );
           })}
         </div>
       </section>
 
-      {/* Thin Architectural Rail Progress Bar */}
+      {/* Thin Hairline Progress Rail */}
       {totalTasksToday > 0 && (
         <div className="log-progress-rail" aria-hidden="true">
           <div
@@ -186,12 +195,11 @@ export default function TodayView() {
       )}
 
       {/* ---------------------------------------------------------------------
-         2. Completion Milestone Banner (Restrained, Editorial, Literary)
+         2. Completion Milestone Banner (Serene & Literary)
          --------------------------------------------------------------------- */}
       {allDone && (
         <div className="milestone-banner">
           <div className="milestone-content">
-            <span className="milestone-eyebrow">MILESTONE ACHIEVED · 100% COMPLETE</span>
             <h3 className="milestone-title">{completionMessage.title}</h3>
             <p className="milestone-subtitle">{completionMessage.subtitle}</p>
           </div>
@@ -199,178 +207,327 @@ export default function TodayView() {
       )}
 
       {/* ---------------------------------------------------------------------
-         3. Integrated Work Log Ledger (Structured Entries)
+         3. Integrated Work Log (Open, Ruled Task System)
          --------------------------------------------------------------------- */}
-      <section className="ledger-surface" aria-label="Tasks list">
+      <section className="work-log-surface" aria-label="Tasks list">
         {filteredTasks.length === 0 ? (
           <div className="empty-ledger">
-            <CheckCircle2 size={32} strokeWidth={1.5} className="empty-glyph" />
+            <CheckCircle2 size={28} strokeWidth={1.5} className="empty-glyph" />
             <div className="empty-content">
-              <h3 className="empty-title">Console Slate Ready</h3>
+              <h3 className="empty-title">All clear for today</h3>
               <p className="empty-desc">
                 {filterCategory === 'All'
-                  ? 'No entries recorded for today yet. Use the entry line below to log your focus targets.'
-                  : `No tasks logged in category "${filterCategory}".`}
+                  ? 'No tasks scheduled yet. Add a task below to get started.'
+                  : `No tasks in "${filterCategory}".`}
               </p>
             </div>
           </div>
         ) : (
-          <div className="ledger-table" role="list">
-            {filteredTasks.map((task, idx) => {
-              const hasXpPop = xpPops.some((p) => p.taskId === task.id);
-              const priority = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
-              const isEditing = editingTaskId === task.id;
+          <div className="work-log-list" role="list">
+            {categoriesToRender.map((cat) => {
+              const catTasks = filteredTasks.filter((t) => t.category === cat);
+              if (catTasks.length === 0) return null;
 
               return (
-                <article
-                  key={task.id}
-                  className={`ledger-entry ${task.completed ? 'completed' : ''}`}
-                  role="listitem"
-                >
-                  {/* Floating XP Tag */}
-                  {hasXpPop && <span className="xp-pop">+20 XP</span>}
-
-                  {/* Entry Index & Checkbox Area */}
-                  <div className="entry-status-cell">
-                    <span className="entry-index">{String(idx + 1).padStart(2, '0')}</span>
-
-                    <button
-                      type="button"
-                      className={`custom-checkbox ${task.completed ? 'checked' : ''}`}
-                      onClick={() => handleCheckClick(task)}
-                      aria-label={`Mark "${task.title}" as ${task.completed ? 'incomplete' : 'completed'}`}
-                      title={task.completed ? 'Mark incomplete' : 'Mark completed'}
-                    >
-                      <svg className="check-icon" width="11" height="9" viewBox="0 0 11 9" fill="none">
-                        <path
-                          d="M1 4.5L4 7.5L10 1.5"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="square"
-                          strokeLinejoin="miter"
-                        />
-                      </svg>
-                    </button>
-
-                    {/* Priority Stamp Pip */}
-                    <span
-                      className="priority-pip"
-                      style={{ backgroundColor: priority.color }}
-                      title={`Priority: ${priority.full} (${priority.label})`}
-                    />
+                <div key={cat} className="category-group">
+                  <div className="category-group-header">
+                    <span className="category-group-title">{cat}</span>
+                    <span className="category-group-count font-mono">{catTasks.length}</span>
                   </div>
 
-                  {/* Primary Title / In-place Editor */}
-                  <div className="entry-body-cell">
-                    {isEditing ? (
-                      <div className="inline-edit-wrapper">
-                        <input
-                          type="text"
-                          className="inline-edit-input"
-                          value={editTitleInput}
-                          onChange={(e) => setEditTitleInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleSaveEdit(task.id);
-                            if (e.key === 'Escape') handleCancelEdit();
-                          }}
-                          autoFocus
-                        />
-                        <div className="inline-edit-actions">
-                          <button
-                            type="button"
-                            className="btn-edit-action save"
-                            onClick={() => handleSaveEdit(task.id)}
-                            title="Save changes (Enter)"
-                          >
-                            <Check size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-edit-action cancel"
-                            onClick={handleCancelEdit}
-                            title="Cancel (Esc)"
-                          >
-                            <X size={13} />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div
-                        className="entry-title-wrap"
-                        onClick={() => handleCheckClick(task)}
-                        title="Click to toggle completion"
-                      >
-                        <span className="entry-title-text">{task.title}</span>
-                      </div>
-                    )}
+                  <div className="category-group-entries">
+                    {catTasks.map((task) => {
+                      const globalIdx = tasks.findIndex((t) => t.id === task.id);
+                      const displayIdx = String((globalIdx >= 0 ? globalIdx : 0) + 1).padStart(2, '0');
+                      const hasXpPop = xpPops.some((p) => p.taskId === task.id);
+                      const priority = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
+                      const isEditing = editingTaskId === task.id;
+
+                      return (
+                        <article
+                          key={task.id}
+                          className={`ledger-entry ${task.completed ? 'completed' : ''}`}
+                          role="listitem"
+                        >
+                          {/* Floating XP Pop */}
+                          {hasXpPop && <span className="xp-pop">+20 XP</span>}
+
+                          {/* Entry Index & Checkbox Area */}
+                          <div className="entry-status-cell">
+                            <span className="entry-index font-mono">{displayIdx}</span>
+
+                            <button
+                              type="button"
+                              className={`custom-checkbox ${task.completed ? 'checked' : ''}`}
+                              onClick={() => handleCheckClick(task)}
+                              aria-label={`Mark "${task.title}" as ${task.completed ? 'incomplete' : 'completed'}`}
+                              title={task.completed ? 'Mark incomplete' : 'Mark completed'}
+                            >
+                              <svg className="check-icon" width="11" height="9" viewBox="0 0 11 9" fill="none">
+                                <path
+                                  d="M1 4.5L4 7.5L10 1.5"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="square"
+                                  strokeLinejoin="miter"
+                                />
+                              </svg>
+                            </button>
+
+                            {/* Priority Indicator Pip */}
+                            <span
+                              className="priority-pip"
+                              style={{ backgroundColor: priority.color }}
+                              title={`Priority: ${priority.label}`}
+                            />
+                          </div>
+
+                          {/* Primary Title / In-place Editor */}
+                          <div className="entry-body-cell">
+                            {isEditing ? (
+                              <div className="inline-edit-wrapper">
+                                <input
+                                  type="text"
+                                  className="inline-edit-input"
+                                  value={editTitleInput}
+                                  onChange={(e) => setEditTitleInput(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveEdit(task.id);
+                                    if (e.key === 'Escape') handleCancelEdit();
+                                  }}
+                                  autoFocus
+                                />
+                                <div className="inline-edit-actions">
+                                  <button
+                                    type="button"
+                                    className="btn-edit-action save"
+                                    onClick={() => handleSaveEdit(task.id)}
+                                    title="Save changes (Enter)"
+                                  >
+                                    <Check size={13} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn-edit-action cancel"
+                                    onClick={handleCancelEdit}
+                                    title="Cancel (Esc)"
+                                  >
+                                    <X size={13} />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className="entry-title-wrap"
+                                onClick={() => handleCheckClick(task)}
+                                title="Click to toggle completion"
+                              >
+                                <span className="entry-title-text">{task.title}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Metadata & Controls Cell */}
+                          <div className="entry-meta-cell">
+                            {/* Duration Stamp */}
+                            {task.timeEstimate && (
+                              <span className="time-stamp font-mono" title={`Estimated focus: ${task.timeEstimate}`}>
+                                <Clock size={11} className="stamp-icon" />
+                                <span>{task.timeEstimate}</span>
+                              </span>
+                            )}
+
+                            {/* Focus Button */}
+                            {!task.completed && (
+                              <button
+                                type="button"
+                                className="btn-start-focus"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveFocusTask(task);
+                                }}
+                                title="Start focus session"
+                              >
+                                <Play size={10} /> Focus
+                              </button>
+                            )}
+
+                            {/* In-place Edit Button */}
+                            {!isEditing && (
+                              <button
+                                type="button"
+                                className="entry-action-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleStartEdit(task);
+                                }}
+                                title="Edit task title"
+                              >
+                                <Edit3 size={13} />
+                              </button>
+                            )}
+
+                            {/* Delete Button */}
+                            <button
+                              type="button"
+                              className="entry-action-btn delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteTask(task.id);
+                              }}
+                              title="Delete task"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </article>
+                      );
+                    })}
                   </div>
-
-                  {/* Metadata & Controls Cell */}
-                  <div className="entry-meta-cell">
-                    {/* Compact Category Tag */}
-                    <span className={`badge badge-${task.category ? task.category.toLowerCase() : 'focus'}`}>
-                      {task.category || 'Focus'}
-                    </span>
-
-                    {/* Duration Stamp */}
-                    {task.timeEstimate && (
-                      <span className="time-stamp" title={`Estimated focus: ${task.timeEstimate}`}>
-                        <Clock size={11} className="stamp-icon" />
-                        <span>{task.timeEstimate}</span>
-                      </span>
-                    )}
-
-                    {/* Focus Timer Trigger Button */}
-                    {!task.completed && (
-                      <button
-                        type="button"
-                        className="btn-start-focus"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveFocusTask(task);
-                        }}
-                        title="Start focus timer for this task"
-                      >
-                        <Play size={10} /> Focus
-                      </button>
-                    )}
-
-                    {/* In-place Edit Button */}
-                    {!isEditing && (
-                      <button
-                        type="button"
-                        className="entry-action-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStartEdit(task);
-                        }}
-                        title="Edit task title"
-                      >
-                        <Edit3 size={13} />
-                      </button>
-                    )}
-
-                    {/* Delete Button */}
-                    <button
-                      type="button"
-                      className="entry-action-btn delete"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteTask(task.id);
-                      }}
-                      title="Remove task from today"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </article>
+                </div>
               );
             })}
+
+            {/* Uncategorized group if any */}
+            {uncategorizedTasks.length > 0 && (
+              <div className="category-group">
+                <div className="category-group-header">
+                  <span className="category-group-title">Other</span>
+                  <span className="category-group-count font-mono">{uncategorizedTasks.length}</span>
+                </div>
+                <div className="category-group-entries">
+                  {uncategorizedTasks.map((task) => {
+                    const globalIdx = tasks.findIndex((t) => t.id === task.id);
+                    const displayIdx = String((globalIdx >= 0 ? globalIdx : 0) + 1).padStart(2, '0');
+                    const hasXpPop = xpPops.some((p) => p.taskId === task.id);
+                    const priority = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
+                    const isEditing = editingTaskId === task.id;
+
+                    return (
+                      <article
+                        key={task.id}
+                        className={`ledger-entry ${task.completed ? 'completed' : ''}`}
+                        role="listitem"
+                      >
+                        {hasXpPop && <span className="xp-pop">+20 XP</span>}
+                        <div className="entry-status-cell">
+                          <span className="entry-index font-mono">{displayIdx}</span>
+                          <button
+                            type="button"
+                            className={`custom-checkbox ${task.completed ? 'checked' : ''}`}
+                            onClick={() => handleCheckClick(task)}
+                            aria-label={`Mark "${task.title}" as ${task.completed ? 'incomplete' : 'completed'}`}
+                            title={task.completed ? 'Mark incomplete' : 'Mark completed'}
+                          >
+                            <svg className="check-icon" width="11" height="9" viewBox="0 0 11 9" fill="none">
+                              <path
+                                d="M1 4.5L4 7.5L10 1.5"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="square"
+                                strokeLinejoin="miter"
+                              />
+                            </svg>
+                          </button>
+                          <span
+                            className="priority-pip"
+                            style={{ backgroundColor: priority.color }}
+                            title={`Priority: ${priority.label}`}
+                          />
+                        </div>
+                        <div className="entry-body-cell">
+                          {isEditing ? (
+                            <div className="inline-edit-wrapper">
+                              <input
+                                type="text"
+                                className="inline-edit-input"
+                                value={editTitleInput}
+                                onChange={(e) => setEditTitleInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveEdit(task.id);
+                                  if (e.key === 'Escape') handleCancelEdit();
+                                }}
+                                autoFocus
+                              />
+                              <div className="inline-edit-actions">
+                                <button
+                                  type="button"
+                                  className="btn-edit-action save"
+                                  onClick={() => handleSaveEdit(task.id)}
+                                >
+                                  <Check size={13} />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-edit-action cancel"
+                                  onClick={handleCancelEdit}
+                                >
+                                  <X size={13} />
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div
+                              className="entry-title-wrap"
+                              onClick={() => handleCheckClick(task)}
+                            >
+                              <span className="entry-title-text">{task.title}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="entry-meta-cell">
+                          {task.timeEstimate && (
+                            <span className="time-stamp font-mono">
+                              <Clock size={11} className="stamp-icon" />
+                              <span>{task.timeEstimate}</span>
+                            </span>
+                          )}
+                          {!task.completed && (
+                            <button
+                              type="button"
+                              className="btn-start-focus"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveFocusTask(task);
+                              }}
+                            >
+                              <Play size={10} /> Focus
+                            </button>
+                          )}
+                          {!isEditing && (
+                            <button
+                              type="button"
+                              className="entry-action-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStartEdit(task);
+                              }}
+                            >
+                              <Edit3 size={13} />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            className="entry-action-btn delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteTask(task.id);
+                            }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* -------------------------------------------------------------------
-           4. Integrated Entry Composer (Clean, Non-Floating)
+           4. Clean Ruled Add Task Trigger & Inline Composer
            ------------------------------------------------------------------- */}
         <div className="entry-composer-area">
           {isAdding ? (
@@ -379,17 +536,17 @@ export default function TodayView() {
                 <input
                   type="text"
                   className="composer-primary-input"
-                  placeholder="Record task title or intention..."
+                  placeholder="What would you like to work on?"
                   value={titleInput}
                   onChange={(e) => setTitleInput(e.target.value)}
                   autoFocus
                 />
               </div>
 
-              {/* Duration Presets & Context Row */}
+              {/* Controls Row */}
               <div className="composer-controls-row">
                 <div className="controls-left">
-                  <span className="picker-label">Target Duration:</span>
+                  <span className="picker-label">Duration:</span>
                   <div className="duration-segmented">
                     {DURATION_PRESETS.map((dur) => (
                       <button
@@ -405,7 +562,7 @@ export default function TodayView() {
 
                   <input
                     type="text"
-                    className="custom-duration-input"
+                    className="custom-duration-input font-mono"
                     placeholder="25m"
                     value={timeInput}
                     onChange={(e) => setTimeInput(e.target.value)}
@@ -431,11 +588,11 @@ export default function TodayView() {
                     className="select-control"
                     value={priorityInput}
                     onChange={(e) => setPriorityInput(e.target.value)}
-                    title="Task priority level"
+                    title="Priority"
                   >
-                    <option value="high">P1 High</option>
-                    <option value="medium">P2 Medium</option>
-                    <option value="low">P3 Low</option>
+                    <option value="high">High priority</option>
+                    <option value="medium">Medium priority</option>
+                    <option value="low">Low priority</option>
                   </select>
 
                   <div className="composer-actions">
@@ -447,7 +604,7 @@ export default function TodayView() {
                       Cancel
                     </button>
                     <button type="submit" className="btn-primary">
-                      <Plus size={14} /> Add Entry
+                      <Plus size={14} /> Add task
                     </button>
                   </div>
                 </div>
@@ -460,8 +617,7 @@ export default function TodayView() {
               onClick={() => setIsAdding(true)}
             >
               <Plus size={15} className="trigger-icon" />
-              <span>Record new focus task...</span>
-              <span className="trigger-hint">[+ ADD]</span>
+              <span>Add a task...</span>
             </button>
           )}
         </div>
@@ -492,7 +648,7 @@ export default function TodayView() {
 
       <style>{`
         /* ==========================================================================
-           Today Work Log Styles (Editorial + Utilitarian Architecture)
+           Today Work Log Styles (Editorial + Personal Workspace)
            ========================================================================== */
         .work-log-container {
           display: flex;
@@ -501,7 +657,7 @@ export default function TodayView() {
           width: 100%;
         }
 
-        /* 1. Header & Telemetry */
+        /* 1. Header */
         .work-log-header {
           display: flex;
           flex-direction: column;
@@ -510,7 +666,7 @@ export default function TodayView() {
 
         .header-meta-group {
           display: flex;
-          align-items: center;
+          align-items: baseline;
           justify-content: space-between;
           flex-wrap: wrap;
           gap: 12px;
@@ -518,8 +674,8 @@ export default function TodayView() {
 
         .log-title-row {
           display: flex;
-          align-items: center;
-          gap: 8px;
+          align-items: baseline;
+          gap: 10px;
         }
 
         .log-heading {
@@ -530,62 +686,28 @@ export default function TodayView() {
           color: var(--text-primary);
         }
 
-        .log-rule-tag {
-          font-family: var(--font-mono);
-          font-size: 0.6875rem;
-          font-weight: 600;
-          padding: 2px 6px;
-          border-radius: var(--radius-xs);
-          background: var(--bg-subtle);
+        .log-count-text {
+          font-size: 0.85rem;
           color: var(--text-muted);
-          border: 1px solid var(--border-subtle);
-          letter-spacing: 0.05em;
+          font-weight: 500;
         }
 
-        .progress-telemetry {
+        .log-progress-stats {
           display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .telemetry-figures {
-          display: inline-flex;
           align-items: baseline;
-          gap: 3px;
-          font-family: var(--font-mono);
-          font-feature-settings: "tnum";
+          gap: 6px;
+          font-size: 0.85rem;
         }
 
-        .figure-completed {
-          font-size: 1.1rem;
-          font-weight: 700;
+        .log-stat-num {
+          font-weight: 600;
           color: var(--text-primary);
         }
 
-        .figure-slash {
-          font-size: 0.9rem;
-          color: var(--text-faint);
-        }
-
-        .figure-total {
-          font-size: 0.95rem;
-          font-weight: 600;
-          color: var(--text-secondary);
-        }
-
-        .figure-label {
-          font-size: 0.675rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          color: var(--text-muted);
-          margin-left: 4px;
-        }
-
-        .percent-stamp {
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
+        .log-stat-pct {
           color: var(--accent);
+          font-size: 0.8rem;
+          font-weight: 600;
         }
 
         /* Category Filter Segmented Strip */
@@ -611,9 +733,9 @@ export default function TodayView() {
           color: var(--text-muted);
           padding: 4px 10px;
           border-radius: var(--radius-sm);
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          font-weight: 500;
+          font-family: var(--font-heading);
+          font-size: 0.775rem;
+          font-weight: 600;
           cursor: pointer;
           white-space: nowrap;
           transition: all var(--duration-fast) ease;
@@ -632,15 +754,14 @@ export default function TodayView() {
 
         .filter-count {
           font-size: 0.65rem;
-          opacity: 0.7;
+          opacity: 0.75;
         }
 
         /* Thin Progress Rail */
         .log-progress-rail {
           width: 100%;
-          height: 3px;
+          height: 2px;
           background: var(--bg-surface-sunken);
-          border-radius: var(--radius-none);
           overflow: hidden;
         }
 
@@ -659,21 +780,12 @@ export default function TodayView() {
           border: 1px solid var(--border);
           border-left: 3px solid var(--accent);
           border-radius: var(--radius-sm);
-          box-shadow: var(--shadow-sm);
         }
 
         .milestone-content {
           display: flex;
           flex-direction: column;
           gap: 3px;
-        }
-
-        .milestone-eyebrow {
-          font-family: var(--font-mono);
-          font-size: 0.675rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          color: var(--accent);
         }
 
         .milestone-title {
@@ -690,18 +802,51 @@ export default function TodayView() {
           color: var(--text-secondary);
         }
 
-        /* 3. Structured Ledger Surface */
-        .ledger-surface {
+        /* 3. Work Log Surface */
+        .work-log-surface {
           display: flex;
           flex-direction: column;
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-md);
+          border-radius: var(--radius-sm);
           overflow: hidden;
-          box-shadow: var(--shadow-sm);
         }
 
-        .ledger-table {
+        .work-log-list {
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Category Group */
+        .category-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .category-group-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.65rem 1.15rem 0.45rem 1.15rem;
+          background: var(--bg-subtle);
+          border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .category-group-title {
+          font-family: var(--font-heading);
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: var(--tracking-wide);
+          text-transform: uppercase;
+          color: var(--text-muted);
+        }
+
+        .category-group-count {
+          font-size: 0.675rem;
+          color: var(--text-faint);
+        }
+
+        .category-group-entries {
           display: flex;
           flex-direction: column;
         }
@@ -731,16 +876,16 @@ export default function TodayView() {
         }
 
         .ledger-entry:last-child {
-          border-bottom: 1px solid var(--border);
+          border-bottom: 1px solid var(--border-subtle);
         }
 
         .ledger-entry:hover {
-          background: #FAF8F5;
+          background: var(--bg-hover);
         }
 
         .ledger-entry.completed {
-          background: #F9F7F4;
-          opacity: 0.72;
+          background: var(--bg-subtle);
+          opacity: 0.7;
         }
 
         /* Status & Checkbox Cell */
@@ -752,7 +897,6 @@ export default function TodayView() {
         }
 
         .entry-index {
-          font-family: var(--font-mono);
           font-size: 0.7rem;
           color: var(--text-faint);
           width: 18px;
@@ -844,7 +988,6 @@ export default function TodayView() {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          font-family: var(--font-mono);
           font-size: 0.725rem;
           color: var(--text-muted);
         }
@@ -886,7 +1029,6 @@ export default function TodayView() {
           align-items: center;
           gap: 16px;
           padding: 3rem 1.75rem;
-          border-bottom: 1px solid var(--border);
         }
 
         .empty-glyph {
@@ -912,7 +1054,7 @@ export default function TodayView() {
           color: var(--text-muted);
         }
 
-        /* 4. Integrated Entry Composer */
+        /* 4. Ruled Add Task Trigger & Composer */
         .entry-composer-area {
           background: var(--bg-surface);
         }
@@ -922,66 +1064,50 @@ export default function TodayView() {
           align-items: center;
           gap: 8px;
           width: 100%;
-          padding: 0.95rem 1.15rem;
+          padding: 0.85rem 1.15rem;
           background: transparent;
           border: none;
-          font-family: var(--font-heading);
-          font-size: 0.875rem;
-          font-weight: 500;
+          border-top: 1px dashed var(--border);
           color: var(--text-muted);
+          font-family: var(--font-heading);
+          font-size: 0.85rem;
+          font-weight: 500;
           cursor: pointer;
-          transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+          transition: color var(--duration-fast) ease, background-color var(--duration-fast) ease;
+          text-align: left;
         }
 
         .composer-trigger:hover {
-          background: var(--bg-subtle);
-          color: var(--text-primary);
+          color: var(--accent);
+          background: var(--bg-hover);
         }
 
         .trigger-icon {
           color: var(--accent);
         }
 
-        .trigger-hint {
-          margin-left: auto;
-          font-family: var(--font-mono);
-          font-size: 0.7rem;
-          color: var(--text-faint);
-        }
-
-        /* Active Composer Form */
         .composer-form {
           display: flex;
           flex-direction: column;
+          gap: 12px;
           padding: 1.15rem;
-          gap: 0.85rem;
+          border-top: 1px solid var(--border);
           background: var(--bg-subtle);
-          animation: composerExpand var(--duration-fast) var(--ease-tactile);
-        }
-
-        @keyframes composerExpand {
-          from {
-            opacity: 0;
-            transform: translateY(-4px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .composer-input-row {
-          width: 100%;
         }
 
         .composer-primary-input {
           width: 100%;
-          border: 1px solid var(--border) !important;
-          background: var(--bg-surface) !important;
           padding: 9px 12px !important;
-          font-family: var(--font-body) !important;
-          font-size: 0.95rem !important;
+          background: var(--bg-surface) !important;
+          border: 1px solid var(--border) !important;
           border-radius: var(--radius-sm) !important;
+          font-family: var(--font-heading) !important;
+          font-size: 0.9375rem !important;
+          color: var(--text-primary) !important;
+        }
+
+        .composer-primary-input:focus {
+          border-color: var(--accent) !important;
         }
 
         .composer-controls-row {
@@ -989,7 +1115,7 @@ export default function TodayView() {
           align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
-          gap: 10px;
+          gap: 12px;
         }
 
         .controls-left {
@@ -1000,12 +1126,10 @@ export default function TodayView() {
         }
 
         .picker-label {
-          font-family: var(--font-mono);
-          font-size: 0.7rem;
+          font-family: var(--font-heading);
+          font-size: 0.725rem;
           font-weight: 600;
-          letter-spacing: 0.04em;
           color: var(--text-muted);
-          text-transform: uppercase;
         }
 
         .duration-segmented {
@@ -1016,7 +1140,6 @@ export default function TodayView() {
         .custom-duration-input {
           width: 54px !important;
           padding: 3px 6px !important;
-          font-family: var(--font-mono) !important;
           font-size: 0.75rem !important;
           text-align: center;
         }
@@ -1030,7 +1153,7 @@ export default function TodayView() {
 
         .select-control {
           padding: 4px 8px !important;
-          font-family: var(--font-mono) !important;
+          font-family: var(--font-heading) !important;
           font-size: 0.775rem !important;
         }
 
@@ -1040,7 +1163,7 @@ export default function TodayView() {
           gap: 6px;
         }
 
-        /* Responsive Layout Adjustments */
+        /* Mobile Layout */
         @media (max-width: 680px) {
           .log-heading {
             font-size: 1.15rem;
@@ -1137,12 +1260,11 @@ export default function TodayView() {
             gap: 4px;
           }
 
-          .duration-btn {
+          .dur-pill {
             flex: 1;
             min-width: 36px;
             text-align: center;
             padding: 6px 4px;
-            font-size: 0.725rem;
           }
 
           .controls-right {
@@ -1164,7 +1286,12 @@ export default function TodayView() {
             min-height: 42px;
           }
 
-          .btn-composer-submit, .btn-composer-cancel {
+          .composer-actions {
+            width: 100%;
+            justify-content: flex-end;
+          }
+
+          .composer-actions button {
             min-height: 34px;
             padding: 6px 14px;
           }

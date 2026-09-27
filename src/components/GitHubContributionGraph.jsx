@@ -72,24 +72,24 @@ export default function GitHubContributionGraph() {
       {/* Section Header */}
       <div className="chronicle-header">
         <div className="chronicle-title-group">
-          <span className="chronicle-eyebrow">CHRONICLE // ANNUAL EFFORT</span>
+          <span className="chronicle-eyebrow">ACTIVITY</span>
           <h3 className="chronicle-title">
             <span className="mono-stat font-mono">{totalCompletedAllTime}</span> contributions in the past year
           </h3>
         </div>
 
-        <div className="chronicle-telemetry">
-          <div className="telemetry-chip">
+        <div className="chronicle-stats">
+          <div className="stat-chip">
             <Calendar size={12} className="chip-icon" />
             <span className="chip-text">
-              <strong>{totalProductiveDays}</strong> productive days
+              <strong className="font-mono">{totalProductiveDays}</strong> productive days
             </span>
           </div>
 
-          <div className="telemetry-chip streak">
+          <div className="stat-chip streak">
             <Flame size={12} className="chip-icon flame" />
             <span className="chip-text">
-              <strong>{streak}d</strong> streak
+              <strong className="font-mono">{streak}d</strong> streak
             </span>
           </div>
         </div>
@@ -276,13 +276,13 @@ export default function GitHubContributionGraph() {
           color: var(--text-primary);
         }
 
-        .chronicle-telemetry {
+        .chronicle-stats {
           display: flex;
           align-items: center;
           gap: 8px;
         }
 
-        .telemetry-chip {
+        .stat-chip {
           display: inline-flex;
           align-items: center;
           gap: 5px;
@@ -290,12 +290,11 @@ export default function GitHubContributionGraph() {
           border-radius: var(--radius-xs);
           border: 1px solid var(--border);
           background: var(--bg-subtle);
-          font-family: var(--font-mono);
           font-size: 0.725rem;
           color: var(--text-secondary);
         }
 
-        .telemetry-chip.streak {
+        .stat-chip.streak {
           background: var(--accent-light);
           border-color: var(--accent-border);
           color: var(--accent);

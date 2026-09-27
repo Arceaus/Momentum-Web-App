@@ -5,30 +5,31 @@ import { Zap } from 'lucide-react';
 export default function LevelBar() {
   const { currentLevel, currentLevelXP, xpPerLevel, progressPercent } = useApp();
 
-  const displayLevel = currentLevel < 10 ? `0${currentLevel}` : `${currentLevel}`;
-
   return (
-    <div className="level-bar-instrument">
+    <div className="level-bar-panel">
       <div className="level-tag-wrap">
-        <span className="level-mono-badge">LVL {displayLevel}</span>
+        <span className="level-badge">
+          <span className="level-txt">Level</span>
+          <span className="level-num font-mono">{currentLevel}</span>
+        </span>
       </div>
 
-      <div className="level-rail-track" title={`${progressPercent}% progress toward next level`}>
+      <div className="level-rail-track" title={`${progressPercent}% progress to Level ${currentLevel + 1}`}>
         <div className="level-rail-fill" style={{ width: `${progressPercent}%` }} />
       </div>
 
-      <div className="xp-telemetry">
-        <Zap size={12} className="xp-telemetry-icon" />
-        <span className="mono-numbers">{currentLevelXP} / {xpPerLevel} XP</span>
-        <span className="mono-pct">[{progressPercent}%]</span>
+      <div className="xp-metric">
+        <Zap size={12} className="xp-icon" />
+        <span className="xp-numbers font-mono">{currentLevelXP} / {xpPerLevel} XP</span>
+        <span className="xp-pct font-mono">({progressPercent}%)</span>
       </div>
 
       <style>{`
-        .level-bar-instrument {
+        .level-bar-panel {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.75rem 1.25rem;
+          padding: 0.75rem 1.15rem;
           background: var(--bg-surface);
           border: 1px solid var(--border);
           border-radius: var(--radius-sm);
@@ -41,60 +42,69 @@ export default function LevelBar() {
           align-items: center;
           flex-shrink: 0;
         }
-        .level-mono-badge {
-          font-family: var(--font-mono);
+
+        .level-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-family: var(--font-heading);
           font-size: 0.775rem;
           font-weight: 700;
-          letter-spacing: var(--tracking-mono);
           color: var(--text-primary);
-          background: var(--bg-surface-sunken);
+          background: var(--bg-subtle);
           border: 1px solid var(--border-subtle);
           padding: 3px 8px;
           border-radius: var(--radius-xs);
         }
 
+        .level-num {
+          font-weight: 700;
+        }
+
         .level-rail-track {
           flex: 1;
-          height: 6px;
+          height: 4px;
           background: var(--bg-surface-sunken);
-          border: 1px solid var(--border-subtle);
-          border-radius: 2px;
+          border-radius: 1px;
           overflow: hidden;
         }
+
         .level-rail-fill {
           height: 100%;
           background: var(--accent);
-          transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: width 0.3s ease;
         }
 
-        .xp-telemetry {
+        .xp-metric {
           display: flex;
           align-items: center;
           gap: 6px;
-          font-family: var(--font-mono);
           font-size: 0.75rem;
           color: var(--text-secondary);
           flex-shrink: 0;
           white-space: nowrap;
         }
-        .xp-telemetry-icon {
+
+        .xp-icon {
           color: var(--accent);
         }
-        .mono-numbers {
+
+        .xp-numbers {
           font-weight: 600;
           color: var(--text-primary);
         }
-        .mono-pct {
+
+        .xp-pct {
           color: var(--text-muted);
           font-size: 0.7rem;
         }
 
         @media (max-width: 600px) {
-          .level-bar-instrument {
+          .level-bar-panel {
             padding: 0.65rem 0.9rem;
             gap: 0.75rem;
           }
-          .mono-pct {
+          .xp-pct {
             display: none;
           }
         }

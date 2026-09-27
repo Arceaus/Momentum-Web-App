@@ -14,18 +14,18 @@ export default function OnboardingModal() {
     onboardUser(nameInput.trim());
   };
 
-  const initialLetter = nameInput.trim() ? nameInput.trim().charAt(0).toUpperCase() : '—';
+  const initialLetter = nameInput.trim() ? nameInput.trim().charAt(0).toUpperCase() : 'M';
 
   return (
     <div className="onboarding-scrim">
       <div className="onboarding-document">
-        {/* Top Protocol Header */}
+        {/* Top Header */}
         <div className="onboarding-masthead">
-          <div className="protocol-badge">
-            <span className="mono-label">MOMENTUM // SYSTEM INITIALIZATION</span>
-            <span className="mono-spec">PROTOCOL 01</span>
+          <div className="brand-identity">
+            <span className="brand-stamp" aria-hidden="true">M</span>
+            <span className="brand-name">MOMENTUM</span>
           </div>
-          <div className="onboarding-stamp">[{initialLetter}]</div>
+          <div className="onboarding-stamp font-mono">[{initialLetter}]</div>
         </div>
 
         {/* Philosophy Intro */}
@@ -34,71 +34,71 @@ export default function OnboardingModal() {
             A personal system for getting work done and seeing your progress.
           </h1>
           <p className="philosophy-prose">
-            Designed without vanity metrics, algorithmic distractions, or external surveillance. Momentum functions as an intentional personal instrument: record your daily commitments, focus with calibrated clarity, and construct an archival record of your genuine output.
+            Designed without vanity metrics or distractions. Momentum is an intentional personal workspace: record what matters today, focus with clarity, and keep a private record of your genuine work.
           </p>
         </div>
 
         {/* Three System Tenets */}
         <div className="tenets-ledger">
           <div className="tenet-row">
-            <span className="tenet-idx">01</span>
+            <span className="tenet-idx font-mono">01</span>
             <div className="tenet-detail">
-              <span className="tenet-heading">Intentional Ledger</span>
-              <span className="tenet-text">Record what matters today. Strike through items as completed.</span>
+              <span className="tenet-heading">Daily Focus</span>
+              <span className="tenet-text">Record what matters today. Check items off as you finish them.</span>
             </div>
           </div>
 
           <div className="tenet-row">
-            <span className="tenet-idx">02</span>
+            <span className="tenet-idx font-mono">02</span>
             <div className="tenet-detail">
-              <span className="tenet-heading">Calibrated Focus</span>
-              <span className="tenet-text">Single-task focus sessions paired with tactile auditory feedback.</span>
+              <span className="tenet-heading">Focus Sessions</span>
+              <span className="tenet-text">Dedicated time to do one thing well, with gentle completion sounds.</span>
             </div>
           </div>
 
           <div className="tenet-row">
-            <span className="tenet-idx">03</span>
+            <span className="tenet-idx font-mono">03</span>
             <div className="tenet-detail">
-              <span className="tenet-heading">Private Archive</span>
-              <span className="tenet-text">52-week activity chronicles persisted locally in browser IndexedDB.</span>
+              <span className="tenet-heading">Your Record</span>
+              <span className="tenet-text">A private 52-week activity log saved directly on your device.</span>
             </div>
           </div>
         </div>
 
-        {/* Operator Identity Form */}
+        {/* Name Form */}
         <form onSubmit={handleSubmit} className="onboarding-form">
           <div className="form-field-group">
             <label className="field-label" htmlFor="onboarding-name">
-              Operator Identity / Callsign
+              Your name
             </label>
             <div className="input-with-stamp">
               <input
                 id="onboarding-name"
                 type="text"
                 className="onboarding-input"
-                placeholder="Enter your name or handle..."
+                placeholder="e.g. Sarthak"
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 autoFocus
                 required
               />
-              <div className="live-preview-chip">
+              <div className="live-preview-chip font-mono">
                 [{initialLetter}]
               </div>
             </div>
           </div>
 
           <button type="submit" className="onboarding-submit-btn">
-            <span>Initialize Workspace</span>
+            <span>Get started</span>
             <ArrowRight size={15} />
           </button>
         </form>
 
-        {/* Micro Guarantee Footer */}
+        {/* Privacy Guarantee Footer */}
         <div className="onboarding-security-footer">
           <div className="security-badge">
             <Lock size={12} />
-            <span>100% CLIENT-SIDE INDEXEDDB PERSISTENCE · ZERO TELEMETRY</span>
+            <span>Private & local · Stored directly in your browser</span>
           </div>
         </div>
       </div>
@@ -107,7 +107,7 @@ export default function OnboardingModal() {
         .onboarding-scrim {
           position: fixed;
           inset: 0;
-          background: rgba(24, 23, 21, 0.65);
+          background: rgba(24, 23, 21, 0.6);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -117,13 +117,13 @@ export default function OnboardingModal() {
         }
 
         .onboarding-document {
-          max-width: 520px;
+          max-width: 500px;
           width: 100%;
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-md);
+          border-radius: var(--radius-sm);
           box-shadow: var(--shadow-modal);
-          padding: 2.25rem 2.25rem;
+          padding: 2.25rem;
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
@@ -135,104 +135,115 @@ export default function OnboardingModal() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding-bottom: 1rem;
+          padding-bottom: 0.85rem;
           border-bottom: 1px solid var(--border-subtle);
         }
-        .protocol-badge {
-          display: flex;
+
+        .brand-identity {
+          display: inline-flex;
           align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-        .mono-label {
-          font-family: var(--font-mono);
-          font-size: 0.7rem;
-          letter-spacing: var(--tracking-mono);
-          color: var(--text-secondary);
-          font-weight: 600;
-        }
-        .mono-spec {
-          font-family: var(--font-mono);
-          font-size: 0.65rem;
-          color: var(--accent);
-          background: var(--accent-light);
-          border: 1px solid var(--accent-border);
-          padding: 1px 6px;
-          border-radius: var(--radius-xs);
-        }
-        .onboarding-stamp {
-          font-family: var(--font-mono);
-          font-size: 0.85rem;
-          font-weight: 700;
-          color: var(--text-primary);
-          background: var(--bg-surface-sunken);
-          border: 1px solid var(--border);
-          padding: 3px 8px;
-          border-radius: var(--radius-xs);
+          gap: 6px;
         }
 
-        /* Statement */
+        .brand-stamp {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          background: var(--text-primary);
+          color: var(--text-inverse);
+          font-family: var(--font-heading);
+          font-size: 0.725rem;
+          font-weight: 700;
+          border-radius: var(--radius-xs);
+          line-height: 1;
+        }
+
+        .brand-name {
+          font-family: var(--font-heading);
+          font-size: 0.825rem;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          color: var(--text-primary);
+        }
+
+        .onboarding-stamp {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--accent);
+        }
+
+        /* Philosophy Intro */
         .philosophy-statement {
           display: flex;
           flex-direction: column;
-          gap: 0.6rem;
+          gap: 8px;
         }
+
         .philosophy-title {
-          font-family: var(--font-display);
-          font-size: 1.85rem;
-          line-height: 1.25;
-          color: var(--text-primary);
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 1.55rem;
           font-weight: 400;
+          color: var(--text-primary);
+          line-height: 1.25;
           letter-spacing: -0.01em;
-          margin: 0;
         }
+
         .philosophy-prose {
-          font-family: var(--font-body);
-          font-size: 0.865rem;
-          color: var(--text-secondary);
+          font-size: 0.875rem;
           line-height: 1.55;
-          margin: 0;
+          color: var(--text-secondary);
         }
 
         /* Tenets */
         .tenets-ledger {
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          background: var(--bg-surface-sunken);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--radius-sm);
-          padding: 10px 14px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xs);
+          background: var(--bg-subtle);
+          overflow: hidden;
         }
+
         .tenet-row {
           display: flex;
-          align-items: baseline;
-          gap: 10px;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 0.75rem 1rem;
+          border-bottom: 1px solid var(--border-subtle);
         }
+
+        .tenet-row:last-child {
+          border-bottom: none;
+        }
+
         .tenet-idx {
-          font-family: var(--font-mono);
-          font-size: 0.7rem;
-          font-weight: 600;
+          font-size: 0.725rem;
+          font-weight: 700;
           color: var(--accent);
-          min-width: 18px;
+          flex-shrink: 0;
+          padding-top: 1px;
         }
+
         .tenet-detail {
           display: flex;
           flex-direction: column;
-          gap: 1px;
+          gap: 2px;
         }
+
         .tenet-heading {
           font-family: var(--font-heading);
-          font-size: 0.775rem;
-          font-weight: 700;
-          letter-spacing: 0.02em;
+          font-size: 0.825rem;
+          font-weight: 600;
           color: var(--text-primary);
         }
+
         .tenet-text {
-          font-family: var(--font-body);
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          line-height: 1.35;
+          font-size: 0.775rem;
+          color: var(--text-secondary);
+          line-height: 1.4;
         }
 
         /* Form */
@@ -241,100 +252,104 @@ export default function OnboardingModal() {
           flex-direction: column;
           gap: 1rem;
         }
+
         .form-field-group {
           display: flex;
           flex-direction: column;
           gap: 6px;
         }
+
         .field-label {
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          letter-spacing: var(--tracking-mono);
-          color: var(--text-secondary);
-          text-transform: uppercase;
+          font-family: var(--font-heading);
+          font-size: 0.775rem;
           font-weight: 600;
+          color: var(--text-secondary);
         }
+
         .input-with-stamp {
           display: flex;
           align-items: center;
           gap: 8px;
         }
+
         .onboarding-input {
           flex: 1;
-          padding: 10px 14px;
-          border-radius: var(--radius-sm);
-          border: 1px solid var(--border);
-          background: var(--bg-surface);
-          font-family: var(--font-body);
-          font-size: 0.95rem;
-          color: var(--text-primary);
+          padding: 9px 12px !important;
+          background: var(--bg-surface) !important;
+          border: 1px solid var(--border) !important;
+          border-radius: var(--radius-xs) !important;
+          font-family: var(--font-heading) !important;
+          font-size: 0.9375rem !important;
+          color: var(--text-primary) !important;
           outline: none;
-          transition: border-color var(--duration-fast) ease;
         }
+
         .onboarding-input:focus {
-          border-color: var(--text-primary);
+          border-color: var(--accent) !important;
         }
+
         .live-preview-chip {
-          font-family: var(--font-mono);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 12px;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xs);
           font-size: 0.85rem;
           font-weight: 700;
           color: var(--accent);
-          background: var(--accent-light);
-          border: 1px solid var(--accent-border);
-          padding: 8px 12px;
-          border-radius: var(--radius-sm);
-          min-width: 44px;
-          text-align: center;
         }
 
         .onboarding-submit-btn {
-          width: 100%;
-          background: var(--text-primary);
-          color: var(--text-inverse);
-          border: 1px solid var(--text-primary);
-          padding: 11px 18px;
-          border-radius: var(--radius-sm);
-          font-family: var(--font-heading);
-          font-size: 0.875rem;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          cursor: pointer;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          transition: opacity var(--duration-fast) ease, transform var(--duration-fast) ease;
-        }
-        .onboarding-submit-btn:hover {
-          opacity: 0.92;
-          transform: translateY(-1px);
+          padding: 10px 18px;
+          background: var(--text-primary);
+          color: var(--text-inverse);
+          border: 1px solid var(--text-primary);
+          border-radius: var(--radius-xs);
+          font-family: var(--font-heading);
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease;
         }
 
-        /* Micro Security */
+        .onboarding-submit-btn:hover {
+          background: var(--accent);
+          border-color: var(--accent);
+        }
+
+        /* Footer */
         .onboarding-security-footer {
           display: flex;
           align-items: center;
           justify-content: center;
           padding-top: 4px;
         }
+
         .security-badge {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          font-family: var(--font-mono);
-          font-size: 0.65rem;
-          letter-spacing: 0.04em;
+          font-family: var(--font-heading);
+          font-size: 0.725rem;
           color: var(--text-muted);
+          font-weight: 500;
         }
 
         @keyframes scrimFadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+
         @keyframes docSlideIn {
           from {
             opacity: 0;
-            transform: translateY(4px);
+            transform: translateY(8px);
           }
           to {
             opacity: 1;
@@ -343,23 +358,17 @@ export default function OnboardingModal() {
         }
 
         @media (max-width: 600px) {
-          .onboarding-scrim {
-            padding: 1rem;
-          }
           .onboarding-document {
-            padding: 1.5rem 1.15rem;
-            gap: 1.15rem;
+            padding: 1.5rem;
+            gap: 1.25rem;
           }
+
           .philosophy-title {
-            font-size: clamp(1.35rem, 5.5vw, 1.65rem);
+            font-size: 1.35rem;
           }
+
           .onboarding-input {
-            font-size: 1rem; /* Prevents unwanted iOS auto-zoom */
-            min-height: 44px;
-          }
-          .onboarding-submit-btn {
-            min-height: 44px;
-            font-size: 0.875rem;
+            font-size: 1rem !important; /* iOS zoom prevention */
           }
         }
       `}</style>

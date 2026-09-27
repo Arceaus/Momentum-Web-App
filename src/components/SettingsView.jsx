@@ -26,7 +26,7 @@ const SOUND_PRESETS = [
   { id: 'pop', label: 'Bubble Pop', desc: 'Playful crisp mechanical pop' },
   { id: 'success', label: 'Level Up Triad', desc: 'Vibrant tri-tone achievement chord' },
   { id: 'marimba', label: 'Wooden Marimba', desc: 'Deep organic wood block chime' },
-  { id: 'custom', label: 'Custom System Audio', desc: 'User-specified local audio file (.mp3, .wav)' },
+  { id: 'custom', label: 'Custom Audio', desc: 'User-selected audio file (.mp3, .wav)' },
 ];
 
 export default function SettingsView() {
@@ -127,42 +127,37 @@ export default function SettingsView() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObject, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `momentum_archive_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute("download", `momentum_backup_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
   const handleResetSlate = () => {
-    if (window.confirm("WARNING: This will permanently wipe all local tasks, logs, and user data. Are you sure?")) {
+    if (window.confirm("WARNING: This will permanently delete all local tasks, history, and preferences. Are you sure?")) {
       resetData();
     }
   };
 
   return (
     <div className="settings-document-container">
-      {/* Document Masthead */}
+      {/* Settings Header */}
       <header className="doc-masthead">
-        <div className="masthead-meta">
-          <span className="mono-code">MOMENTUM // SYSTEM SPECIFICATION</span>
-          <span className="mono-badge">DOC-06 · CONFIGURATION</span>
-        </div>
-        <h1 className="doc-title">System Settings</h1>
+        <h1 className="doc-title">Settings</h1>
         <p className="doc-summary">
-          Control document for workspace parameters, operator attribution, auditory telemetry, local storage allocation, and archival backups.
+          Manage your profile, sound preferences, appearance, and local data.
         </p>
       </header>
 
-      {/* SECTION 01: OPERATOR PROFILE */}
+      {/* SECTION 01: PROFILE */}
       <section className="settings-doc-section">
         <div className="section-head">
-          <div className="section-number">01</div>
           <div className="section-info">
             <h2 className="section-title">
-              <User size={15} /> Operator Identity
+              <User size={16} /> Profile
             </h2>
             <p className="section-subtext">
-              Attribution metadata displayed across console headers, stamps, and workspace logs.
+              Your name, initials monogram, and daily completion target.
             </p>
           </div>
         </div>
@@ -170,9 +165,9 @@ export default function SettingsView() {
         <form onSubmit={handleSaveProfile} className="section-body">
           <div className="fields-grid">
             <div className="field-group">
-              <label className="field-label" htmlFor="operator-name">Operator Name / Callsign</label>
+              <label className="field-label" htmlFor="user-name">Your name</label>
               <input
-                id="operator-name"
+                id="user-name"
                 type="text"
                 className="input-control"
                 value={name}
@@ -182,58 +177,57 @@ export default function SettingsView() {
             </div>
 
             <div className="field-group">
-              <label className="field-label" htmlFor="operator-avatar">Monogram Stamp</label>
+              <label className="field-label" htmlFor="user-avatar">Monogram</label>
               <div className="monogram-input-wrap">
                 <input
-                  id="operator-avatar"
+                  id="user-avatar"
                   type="text"
-                  className="input-control monogram-input"
+                  className="input-control monogram-input font-mono"
                   maxLength={2}
                   value={avatar}
                   onChange={(e) => setAvatar(e.target.value.toUpperCase())}
                   placeholder="M"
                 />
-                <div className="monogram-live-stamp">
+                <div className="monogram-live-stamp font-mono">
                   [{avatar || '?'}]
                 </div>
               </div>
             </div>
 
             <div className="field-group">
-              <label className="field-label" htmlFor="operator-goal">Daily Focus Target (Tasks)</label>
+              <label className="field-label" htmlFor="user-goal">Daily goal (tasks)</label>
               <div className="number-input-wrap">
                 <input
-                  id="operator-goal"
+                  id="user-goal"
                   type="number"
                   min={1}
                   max={20}
-                  className="input-control"
+                  className="input-control font-mono"
                   value={dailyGoal}
                   onChange={(e) => setDailyGoal(e.target.value)}
                 />
-                <span className="field-unit">tasks / cycle</span>
+                <span className="field-unit">tasks / day</span>
               </div>
             </div>
           </div>
 
           <div className="section-action-row">
             <button type="submit" className="btn-action-primary">
-              Save Operator Identity
+              Save changes
             </button>
           </div>
         </form>
       </section>
 
-      {/* SECTION 02: AUDITORY FEEDBACK */}
+      {/* SECTION 02: SOUNDS */}
       <section className="settings-doc-section">
         <div className="section-head">
-          <div className="section-number">02</div>
           <div className="section-info">
             <h2 className="section-title">
-              <Music size={15} /> Auditory Telemetry
+              <Music size={16} /> Sounds
             </h2>
             <p className="section-subtext">
-              Tactile acoustic verification tones emitted upon task completion.
+              Audio feedback played when completing tasks.
             </p>
           </div>
         </div>
@@ -242,8 +236,8 @@ export default function SettingsView() {
           {/* Master Audio Control Switch & Test */}
           <div className="control-bar-row">
             <div className="control-bar-label">
-              <div className="label-main">Acoustic Feedback State</div>
-              <div className="label-sub">Enable or mute audio tones when tasks are checked off</div>
+              <div className="label-main">Completion sound</div>
+              <div className="label-sub">Play a gentle tone when checking off a task</div>
             </div>
 
             <div className="control-bar-actions">
@@ -271,7 +265,7 @@ export default function SettingsView() {
                   onClick={handleTestAudio}
                   title="Play current sound"
                 >
-                  <Play size={12} /> Test Tone
+                  <Play size={12} /> Test sound
                 </button>
               )}
             </div>
@@ -281,7 +275,7 @@ export default function SettingsView() {
           {soundEnabled && (
             <div className="presets-block">
               <div className="presets-header">
-                <span className="field-label">Available Tone Syntheses</span>
+                <span className="field-label">Sound theme</span>
                 {customSoundName && soundPreset === 'custom' && (
                   <span className="preset-active-custom">
                     <Check size={12} /> File: {customSoundName}
@@ -307,7 +301,7 @@ export default function SettingsView() {
                       }}
                     >
                       <div className="entry-marker">
-                        <span className="mono-idx">{idxStr}</span>
+                        <span className="mono-idx font-mono">{idxStr}</span>
                         <span className="radio-pip">{isSelected ? '●' : '○'}</span>
                       </div>
                       <div className="entry-content">
@@ -315,7 +309,7 @@ export default function SettingsView() {
                         <span className="entry-desc">{preset.desc}</span>
                       </div>
                       {isSelected && (
-                        <span className="entry-status-badge">CURRENT</span>
+                        <span className="entry-status-badge">ACTIVE</span>
                       )}
                     </div>
                   );
@@ -337,7 +331,7 @@ export default function SettingsView() {
                   className="btn-action-dashed"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Upload size={13} /> Upload Custom Audio File (.mp3, .wav, .ogg)
+                  <Upload size={13} /> Upload custom audio (.mp3, .wav)
                 </button>
               </div>
             </div>
@@ -345,16 +339,15 @@ export default function SettingsView() {
         </div>
       </section>
 
-      {/* SECTION 03: APPEARANCE & THEME */}
+      {/* SECTION 03: APPEARANCE */}
       <section className="settings-doc-section">
         <div className="section-head">
-          <div className="section-number">03</div>
           <div className="section-info">
             <h2 className="section-title">
-              <Sun size={15} /> Appearance & Visual Canvas
+              <Sun size={16} /> Appearance
             </h2>
             <p className="section-subtext">
-              Select between warm architectural paper or dark drafting slate visual mode.
+              Choose your preferred workspace aesthetic.
             </p>
           </div>
         </div>
@@ -378,7 +371,7 @@ export default function SettingsView() {
                 <div className="theme-name">
                   <Sun size={13} /> Warm Paper Ground
                 </div>
-                <div className="theme-desc">Architectural vellum, carbon ink, terracotta vermilion</div>
+                <div className="theme-desc">Architectural paper, carbon ink, terracotta accent</div>
               </div>
               <div className="theme-check">{theme === 'light' ? '● SELECTED' : '○'}</div>
             </div>
@@ -400,7 +393,7 @@ export default function SettingsView() {
                 <div className="theme-name">
                   <Moon size={13} /> Drafting Slate Dark
                 </div>
-                <div className="theme-desc">Low-luminance graphite ground, calibrated contrast</div>
+                <div className="theme-desc">Warm charcoal slate, calm low-contrast ground</div>
               </div>
               <div className="theme-check">{theme === 'dark' ? '● SELECTED' : '○'}</div>
             </div>
@@ -408,32 +401,30 @@ export default function SettingsView() {
         </div>
       </section>
 
-      {/* SECTION 04: STORAGE & DATABASE */}
+      {/* SECTION 04: STORAGE */}
       <section className="settings-doc-section">
         <div className="section-head">
-          <div className="section-number">04</div>
           <div className="section-info">
             <div className="section-title-wrap">
               <h2 className="section-title">
-                <Database size={15} /> Local Database & Telemetry
+                <Database size={16} /> Storage
               </h2>
-              <span className="status-stamp">INDEXEDDB ENGINE ACTIVE</span>
+              <span className="status-stamp">INDEXEDDB · LOCAL</span>
             </div>
             <p className="section-subtext">
-              High-performance client-side browser database. All data resides 100% locally on your machine with zero third-party telemetry.
+              All your tasks, streaks, and history reside privately on your device.
             </p>
           </div>
         </div>
 
         <div className="section-body">
-          {/* Calibrated Storage Precision Rail Gauge */}
-          <div className="storage-telemetry-box">
-            <div className="telemetry-top">
-              <div className="telemetry-label">
+          <div className="storage-card-box">
+            <div className="storage-top">
+              <div className="storage-label">
                 <HardDrive size={13} />
-                <span>STORAGE ALLOCATION GAUGE</span>
+                <span>Local storage</span>
               </div>
-              <div className="telemetry-numbers">
+              <div className="storage-numbers font-mono">
                 <strong>{storageMetrics.usedKB} KB</strong> used · {storageMetrics.quotaGB} GB available
               </div>
             </div>
@@ -445,24 +436,23 @@ export default function SettingsView() {
               />
             </div>
 
-            <div className="telemetry-meta">
-              <span className="mono-sub">HEALTH: NOMINAL (V12 SCHEMA)</span>
-              <span className="mono-sub">{storageMetrics.percentUsed}% CAPACITY UTILIZED</span>
+            <div className="storage-meta">
+              <span className="mono-sub">100% PRIVATE · STORED ON THIS DEVICE</span>
+              <span className="mono-sub font-mono">{storageMetrics.percentUsed}% USED</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 05: DATA MANAGEMENT & LIFECYCLE */}
+      {/* SECTION 05: YOUR DATA */}
       <section className="settings-doc-section">
         <div className="section-head">
-          <div className="section-number">05</div>
           <div className="section-info">
             <h2 className="section-title">
-              <ShieldCheck size={15} /> Workspace Lifecycle & Archives
+              <ShieldCheck size={16} /> Your Data
             </h2>
             <p className="section-subtext">
-              Export complete structured JSON backups for offline archiving or reset the workspace ledger.
+              Export complete JSON backups or reset your workspace data.
             </p>
           </div>
         </div>
@@ -470,15 +460,15 @@ export default function SettingsView() {
         <div className="section-body">
           <div className="action-buttons-strip">
             <button type="button" className="btn-action-secondary" onClick={handleExportData}>
-              <Download size={13} /> Export JSON Archive
+              <Download size={13} /> Export data (JSON)
             </button>
 
             <button type="button" className="btn-action-secondary" onClick={logoutUser}>
-              <LogOut size={13} /> Switch Profile / Sign Out
+              <LogOut size={13} /> Switch profile / Sign out
             </button>
 
             <button type="button" className="btn-action-danger" onClick={handleResetSlate}>
-              <RotateCcw size={13} /> Reset Workspace Slate
+              <RotateCcw size={13} /> Reset all data
             </button>
           </div>
         </div>
@@ -488,12 +478,11 @@ export default function SettingsView() {
         .settings-document-container {
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          box-shadow: var(--shadow-sm);
-          padding: 2.25rem 2.5rem;
+          border-radius: var(--radius-sm);
+          padding: 2rem 2.25rem;
           display: flex;
           flex-direction: column;
-          gap: 2.5rem;
+          gap: 2.25rem;
           margin-bottom: 2rem;
         }
 
@@ -501,308 +490,212 @@ export default function SettingsView() {
         .doc-masthead {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 6px;
           padding-bottom: 1.5rem;
-          border-bottom: 1px solid var(--border);
-        }
-        .masthead-meta {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-        .mono-code {
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          letter-spacing: var(--tracking-mono);
-          color: var(--text-muted);
-          font-weight: 500;
-        }
-        .mono-badge {
-          font-family: var(--font-mono);
-          font-size: 0.675rem;
-          color: var(--accent);
-          background: var(--accent-light);
-          border: 1px solid var(--accent-border);
-          padding: 2px 7px;
-          border-radius: var(--radius-xs);
-          letter-spacing: 0.04em;
-        }
-        .doc-title {
-          font-family: var(--font-heading);
-          font-size: 1.65rem;
-          font-weight: 700;
-          letter-spacing: var(--tracking-tight);
-          color: var(--text-primary);
-          margin: 0;
-        }
-        .doc-summary {
-          font-size: 0.875rem;
-          color: var(--text-secondary);
-          line-height: 1.55;
-          margin: 0;
-          max-width: 640px;
+          border-bottom: 1px solid var(--border-subtle);
         }
 
-        /* Sections */
+        .doc-title {
+          font-family: var(--font-heading);
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          letter-spacing: -0.02em;
+        }
+
+        .doc-summary {
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          line-height: 1.5;
+        }
+
+        /* Section Layout */
         .settings-doc-section {
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
-          padding-bottom: 2rem;
+          padding-bottom: 1.75rem;
           border-bottom: 1px solid var(--border-subtle);
         }
-        .settings-doc-section:last-child {
-          padding-bottom: 0;
+
+        .settings-doc-section:last-of-type {
           border-bottom: none;
+          padding-bottom: 0;
         }
 
         .section-head {
           display: flex;
           align-items: flex-start;
-          gap: 1rem;
+          gap: 14px;
         }
-        .section-number {
-          font-family: var(--font-mono);
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: var(--text-faint);
-          padding-top: 2px;
-          min-width: 22px;
-        }
+
         .section-info {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 3px;
           flex: 1;
         }
+
         .section-title-wrap {
           display: flex;
           align-items: center;
           gap: 10px;
           flex-wrap: wrap;
         }
+
         .section-title {
-          font-family: var(--font-heading);
-          font-size: 1.05rem;
-          font-weight: 700;
-          letter-spacing: var(--tracking-wide);
-          color: var(--text-primary);
           display: flex;
           align-items: center;
           gap: 8px;
-          margin: 0;
+          font-family: var(--font-heading);
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: var(--text-primary);
         }
-        .section-subtext {
-          font-size: 0.815rem;
-          color: var(--text-muted);
-          line-height: 1.45;
-          margin: 0;
-        }
+
         .status-stamp {
-          font-family: var(--font-mono);
-          font-size: 0.675rem;
-          color: var(--success);
-          background: var(--success-light);
-          border: 1px solid var(--success-border);
-          padding: 2px 7px;
+          font-family: var(--font-heading);
+          font-size: 0.65rem;
+          font-weight: 700;
+          padding: 2px 6px;
           border-radius: var(--radius-xs);
-          letter-spacing: 0.04em;
+          background: var(--bg-subtle);
+          color: var(--text-muted);
+          border: 1px solid var(--border-subtle);
+          letter-spacing: var(--tracking-wide);
+        }
+
+        .section-subtext {
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          line-height: 1.45;
         }
 
         .section-body {
-          padding-left: 2.4rem;
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
         }
 
-        /* Form Controls */
+        /* Form Fields Grid */
         .fields-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 1.25rem;
         }
+
         .field-group {
           display: flex;
           flex-direction: column;
           gap: 6px;
         }
+
         .field-label {
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          letter-spacing: var(--tracking-mono);
-          color: var(--text-secondary);
-          text-transform: uppercase;
+          font-family: var(--font-heading);
+          font-size: 0.775rem;
           font-weight: 600;
+          color: var(--text-secondary);
         }
+
         .input-control {
-          background: var(--bg-surface-sunken);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          padding: 8px 12px;
-          font-family: var(--font-body);
-          font-size: 0.875rem;
-          color: var(--text-primary);
+          width: 100%;
+          padding: 7px 10px !important;
+          background: var(--bg-surface) !important;
+          border: 1px solid var(--border) !important;
+          border-radius: var(--radius-xs) !important;
+          font-family: var(--font-heading) !important;
+          font-size: 0.875rem !important;
+          color: var(--text-primary) !important;
           outline: none;
-          transition: border-color var(--duration-fast) ease;
         }
+
         .input-control:focus {
-          border-color: var(--text-primary);
-          background: var(--bg-surface);
+          border-color: var(--accent) !important;
         }
 
-        .monogram-input-wrap {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .monogram-input {
-          width: 60px;
-          text-align: center;
-          font-family: var(--font-mono);
-          font-weight: 700;
-          letter-spacing: 0.08em;
-        }
-        .monogram-live-stamp {
-          font-family: var(--font-mono);
-          font-size: 0.825rem;
-          font-weight: 700;
-          color: var(--accent);
-          background: var(--accent-light);
-          border: 1px solid var(--accent-border);
-          padding: 6px 12px;
-          border-radius: var(--radius-sm);
-        }
-
+        .monogram-input-wrap,
         .number-input-wrap {
           display: flex;
           align-items: center;
           gap: 8px;
         }
-        .number-input-wrap .input-control {
-          width: 80px;
-          font-family: var(--font-mono);
+
+        .monogram-input {
+          width: 50px !important;
+          text-align: center;
+          text-transform: uppercase;
         }
+
+        .monogram-live-stamp {
+          font-size: 0.8125rem;
+          font-weight: 700;
+          color: var(--accent);
+        }
+
         .field-unit {
-          font-family: var(--font-mono);
           font-size: 0.75rem;
           color: var(--text-muted);
         }
 
         .section-action-row {
           display: flex;
-          justify-content: flex-start;
+          justify-content: flex-end;
           padding-top: 4px;
         }
 
-        /* Buttons */
         .btn-action-primary {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
           background: var(--text-primary);
           color: var(--text-inverse);
           border: 1px solid var(--text-primary);
-          padding: 8px 18px;
-          border-radius: var(--radius-sm);
+          padding: 7px 16px;
+          border-radius: var(--radius-xs);
           font-family: var(--font-heading);
-          font-size: 0.825rem;
+          font-size: 0.8125rem;
           font-weight: 600;
-          letter-spacing: 0.02em;
           cursor: pointer;
-          transition: background var(--duration-fast) ease, opacity var(--duration-fast) ease;
+          transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease;
         }
+
         .btn-action-primary:hover {
-          opacity: 0.9;
-        }
-
-        .btn-action-secondary {
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          color: var(--text-primary);
-          padding: 7px 14px;
-          border-radius: var(--radius-sm);
-          font-family: var(--font-heading);
-          font-size: 0.8rem;
-          font-weight: 600;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease;
-        }
-        .btn-action-secondary:hover {
-          background: var(--bg-hover);
-          border-color: var(--border-strong);
-        }
-
-        .btn-action-danger {
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          color: var(--danger);
-          padding: 7px 14px;
-          border-radius: var(--radius-sm);
-          font-family: var(--font-heading);
-          font-size: 0.8rem;
-          font-weight: 600;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: all var(--duration-fast) ease;
-        }
-        .btn-action-danger:hover {
-          background: var(--danger-light);
-          border-color: var(--danger-border);
-        }
-
-        .btn-action-dashed {
-          background: var(--bg-surface-sunken);
-          border: 1px dashed var(--border-dashed);
-          color: var(--text-secondary);
-          padding: 8px 14px;
-          border-radius: var(--radius-sm);
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: all var(--duration-fast) ease;
-        }
-        .btn-action-dashed:hover {
+          background: var(--accent);
           border-color: var(--accent);
-          color: var(--accent);
-          background: var(--accent-light);
         }
 
-        /* Control Bar (Audio State) */
+        /* Sound Controls */
         .control-bar-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          padding: 0.85rem 1rem;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xs);
           flex-wrap: wrap;
           gap: 12px;
-          background: var(--bg-surface-sunken);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--radius-sm);
-          padding: 10px 14px;
         }
+
         .control-bar-label .label-main {
+          font-family: var(--font-heading);
           font-size: 0.85rem;
           font-weight: 600;
           color: var(--text-primary);
         }
+
         .control-bar-label .label-sub {
-          font-size: 0.75rem;
+          font-size: 0.775rem;
           color: var(--text-muted);
         }
+
         .control-bar-actions {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
 
-        /* Segmented Switch */
         .segmented-switch {
           display: inline-flex;
           background: var(--bg-surface);
@@ -811,310 +704,384 @@ export default function SettingsView() {
           padding: 2px;
           gap: 2px;
         }
+
         .switch-segment {
-          background: transparent;
-          border: none;
-          padding: 4px 10px;
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          font-weight: 600;
-          color: var(--text-muted);
-          cursor: pointer;
-          border-radius: 2px;
           display: inline-flex;
           align-items: center;
           gap: 5px;
+          padding: 4px 10px;
+          border: none;
+          background: transparent;
+          font-family: var(--font-heading);
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          border-radius: 2px;
+          cursor: pointer;
           transition: all var(--duration-fast) ease;
         }
+
         .switch-segment.active {
           background: var(--text-primary);
           color: var(--text-inverse);
         }
 
-        /* Presets Matrix */
+        .btn-action-secondary {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          color: var(--text-secondary);
+          padding: 5px 12px;
+          border-radius: var(--radius-xs);
+          font-family: var(--font-heading);
+          font-size: 0.775rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all var(--duration-fast) ease;
+        }
+
+        .btn-action-secondary:hover {
+          color: var(--text-primary);
+          background: var(--bg-hover);
+          border-color: var(--border-strong);
+        }
+
+        .btn-action-danger {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: var(--bg-surface);
+          border: 1px solid var(--danger-border);
+          color: var(--danger);
+          padding: 5px 12px;
+          border-radius: var(--radius-xs);
+          font-family: var(--font-heading);
+          font-size: 0.775rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all var(--duration-fast) ease;
+        }
+
+        .btn-action-danger:hover {
+          background: var(--danger-light);
+          border-color: var(--danger);
+        }
+
+        /* Sound Presets Table */
         .presets-block {
           display: flex;
           flex-direction: column;
           gap: 8px;
         }
+
         .presets-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
+
         .preset-active-custom {
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          color: var(--accent);
           display: inline-flex;
           align-items: center;
           gap: 4px;
+          font-size: 0.725rem;
+          color: var(--accent);
+          font-weight: 600;
         }
 
         .presets-table {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 8px;
-        }
-        .preset-entry {
-          background: var(--bg-surface);
+          display: flex;
+          flex-direction: column;
           border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          padding: 9px 12px;
+          border-radius: var(--radius-xs);
+          overflow: hidden;
+        }
+
+        .preset-entry {
           display: flex;
           align-items: center;
-          gap: 10px;
+          padding: 0.75rem 1rem;
+          background: var(--bg-surface);
+          border-bottom: 1px solid var(--border-subtle);
           cursor: pointer;
-          transition: border-color var(--duration-fast) ease, background var(--duration-fast) ease;
+          gap: 12px;
+          transition: background-color var(--duration-fast) ease;
         }
+
+        .preset-entry:last-child {
+          border-bottom: none;
+        }
+
         .preset-entry:hover {
-          border-color: var(--border-strong);
           background: var(--bg-hover);
         }
+
         .preset-entry.selected {
-          border-color: var(--accent);
-          background: var(--accent-light);
+          background: var(--bg-subtle);
         }
+
         .entry-marker {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
+          flex-shrink: 0;
         }
+
         .mono-idx {
-          font-family: var(--font-mono);
           font-size: 0.7rem;
-          color: var(--text-muted);
+          color: var(--text-faint);
         }
+
         .radio-pip {
           font-size: 0.8rem;
           color: var(--accent);
         }
+
         .entry-content {
           display: flex;
           flex-direction: column;
-          gap: 1px;
+          gap: 2px;
           flex: 1;
         }
+
         .entry-name {
-          font-size: 0.825rem;
+          font-family: var(--font-heading);
+          font-size: 0.85rem;
           font-weight: 600;
           color: var(--text-primary);
         }
+
         .entry-desc {
-          font-size: 0.725rem;
+          font-size: 0.75rem;
           color: var(--text-muted);
         }
+
         .entry-status-badge {
-          font-family: var(--font-mono);
-          font-size: 0.625rem;
+          font-family: var(--font-heading);
+          font-size: 0.65rem;
           font-weight: 700;
+          padding: 2px 6px;
+          border-radius: var(--radius-xs);
+          background: var(--accent-light);
           color: var(--accent);
           border: 1px solid var(--accent-border);
-          padding: 1px 5px;
-          border-radius: var(--radius-xs);
-          letter-spacing: 0.05em;
+          letter-spacing: var(--tracking-wide);
         }
+
         .upload-action-row {
+          display: flex;
           padding-top: 4px;
+        }
+
+        .btn-action-dashed {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 12px;
+          background: var(--bg-surface);
+          border: 1px dashed var(--border);
+          color: var(--text-muted);
+          font-family: var(--font-heading);
+          font-size: 0.775rem;
+          font-weight: 600;
+          border-radius: var(--radius-xs);
+          cursor: pointer;
+          transition: all var(--duration-fast) ease;
+        }
+
+        .btn-action-dashed:hover {
+          border-color: var(--accent);
+          color: var(--accent);
+          background: var(--accent-light);
         }
 
         /* Theme Selector */
         .theme-selector-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
           gap: 12px;
         }
+
         .theme-option {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          padding: 1rem;
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          padding: 12px;
-          display: flex;
-          align-items: center;
-          gap: 12px;
+          border-radius: var(--radius-xs);
           cursor: pointer;
           transition: all var(--duration-fast) ease;
         }
+
         .theme-option:hover {
           border-color: var(--border-strong);
+          background: var(--bg-hover);
         }
+
         .theme-option.selected {
           border-color: var(--accent);
-          background: var(--accent-light);
+          background: var(--bg-subtle);
         }
+
         .theme-preview {
-          width: 44px;
-          height: 44px;
-          border-radius: var(--radius-xs);
+          height: 60px;
+          border: 1px solid var(--border);
+          border-radius: 2px;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 4px;
-          border: 1px solid var(--border);
-          flex-shrink: 0;
+          justify-content: space-between;
+          padding: 8px;
         }
-        .light-preview {
-          background: #F7F5F0;
-          color: #181715;
+
+        .theme-preview.light-preview {
+          background: #FAF8F5;
+          color: #181716;
         }
-        .dark-preview {
-          background: #141312;
-          color: #EDEBE8;
-          border-color: #38342E;
+
+        .theme-preview.dark-preview {
+          background: #181716;
+          color: #F0ECE1;
         }
+
         .preview-rule {
-          width: 24px;
           height: 2px;
-          background: currentColor;
-          opacity: 0.25;
+          background: var(--accent);
+          width: 24px;
         }
+
         .preview-stamp {
-          font-family: var(--font-mono);
-          font-size: 0.65rem;
+          font-family: var(--font-heading);
+          font-size: 0.7rem;
           font-weight: 700;
         }
+
         .theme-text {
-          flex: 1;
           display: flex;
           flex-direction: column;
           gap: 2px;
         }
+
         .theme-name {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: var(--text-primary);
           display: flex;
           align-items: center;
           gap: 6px;
+          font-family: var(--font-heading);
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-primary);
         }
+
         .theme-desc {
-          font-size: 0.725rem;
+          font-size: 0.75rem;
           color: var(--text-muted);
         }
+
         .theme-check {
-          font-family: var(--font-mono);
+          font-family: var(--font-heading);
           font-size: 0.7rem;
-          font-weight: 600;
-          color: var(--text-secondary);
-        }
-        .theme-option.selected .theme-check {
+          font-weight: 700;
           color: var(--accent);
         }
 
-        /* Storage Telemetry */
-        .storage-telemetry-box {
-          background: var(--bg-surface-sunken);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--radius-sm);
-          padding: 1rem 1.25rem;
+        /* Storage Box */
+        .storage-card-box {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
+          padding: 1rem 1.15rem;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xs);
         }
-        .telemetry-top {
+
+        .storage-top {
           display: flex;
           align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
           gap: 8px;
         }
-        .telemetry-label {
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          font-weight: 600;
-          letter-spacing: var(--tracking-mono);
-          color: var(--text-primary);
-          display: flex;
+
+        .storage-label {
+          display: inline-flex;
           align-items: center;
           gap: 6px;
+          font-family: var(--font-heading);
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: var(--tracking-wide);
+          text-transform: uppercase;
+          color: var(--text-primary);
         }
-        .telemetry-numbers {
-          font-family: var(--font-mono);
+
+        .storage-numbers {
           font-size: 0.775rem;
           color: var(--text-secondary);
         }
+
         .precision-rail-track {
           width: 100%;
-          height: 6px;
-          background: var(--bg-hover);
-          border: 1px solid var(--border-subtle);
-          border-radius: 2px;
+          height: 4px;
+          background: var(--bg-surface-sunken);
+          border-radius: 1px;
           overflow: hidden;
         }
+
         .precision-rail-fill {
           height: 100%;
           background: var(--accent);
           transition: width 0.3s ease;
         }
-        .telemetry-meta {
+
+        .storage-meta {
           display: flex;
+          align-items: center;
           justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 6px;
-        }
-        .mono-sub {
-          font-family: var(--font-mono);
+          font-family: var(--font-heading);
           font-size: 0.675rem;
+          font-weight: 600;
           color: var(--text-muted);
+          letter-spacing: var(--tracking-wide);
         }
 
         /* Action Buttons Strip */
         .action-buttons-strip {
           display: flex;
           align-items: center;
+          gap: 8px;
           flex-wrap: wrap;
-          gap: 10px;
         }
 
-        /* Responsive Layout */
         @media (max-width: 680px) {
           .settings-document-container {
             padding: 1.25rem 1rem;
             gap: 1.75rem;
           }
-          .doc-title {
-            font-size: 1.45rem;
-          }
-          .section-body {
-            padding-left: 0;
-          }
+
           .fields-grid {
             grid-template-columns: 1fr;
           }
-          .input-control {
-            font-size: 1rem !important; /* Prevents iOS auto-zoom */
-            min-height: 40px;
-          }
-          .presets-table {
-            grid-template-columns: 1fr;
-          }
-          .theme-selector-grid {
-            grid-template-columns: 1fr;
-          }
+
           .control-bar-row {
             flex-direction: column;
             align-items: flex-start;
-            gap: 10px;
           }
+
           .control-bar-actions {
             width: 100%;
             justify-content: space-between;
           }
+
           .action-buttons-strip {
             flex-direction: column;
             align-items: stretch;
           }
-          .btn-action-primary,
-          .btn-action-secondary,
-          .btn-action-danger,
-          .btn-action-dashed {
-            min-height: 42px;
+
+          .action-buttons-strip button {
             justify-content: center;
-          }
-          .switch-segment {
-            min-height: 32px;
-            padding: 6px 12px;
           }
         }
       `}</style>

@@ -39,7 +39,7 @@ export default function HistoryLogSection() {
   };
 
   const formatHeaderDate = (dateStr, displayDate) => {
-    if (!dateStr) return displayDate || 'DATE';
+    if (!dateStr) return displayDate || 'Date';
     try {
       const parts = dateStr.split('-');
       if (parts.length === 3) {
@@ -49,12 +49,12 @@ export default function HistoryLogSection() {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
-        }).toUpperCase();
+        });
       }
     } catch (e) {
       console.warn('Date format error:', e);
     }
-    return (displayDate || dateStr).toUpperCase();
+    return displayDate || dateStr;
   };
 
   // Dynamic streak calculation
@@ -82,7 +82,7 @@ export default function HistoryLogSection() {
   return (
     <div className="history-view-container" aria-label="Personal Work Record">
       {/* ---------------------------------------------------------------------
-         1. Typography-First High-Level Statistics Strip (Non-Card Heavy)
+         1. Typographic Summary Statistics Strip
          --------------------------------------------------------------------- */}
       <section className="stats-typographic-strip">
         <div className="stat-metric-cell">
@@ -102,27 +102,26 @@ export default function HistoryLogSection() {
 
         <div className="stat-metric-cell">
           <span className="stat-large-val font-mono">{totalFocusHours}h</span>
-          <span className="stat-label-caps">TOTAL FOCUS TIME</span>
+          <span className="stat-label-caps">FOCUS TIME</span>
         </div>
       </section>
 
       {/* ---------------------------------------------------------------------
-         2. Integrated Annual Activity Chronicle (Restrained Archival Grid)
+         2. Activity Grid
          --------------------------------------------------------------------- */}
       <GitHubContributionGraph />
 
       {/* ---------------------------------------------------------------------
-         3. Archival Work History Ledger (Grouped Chronological Archive)
+         3. Completed Tasks Archive Ledger
          --------------------------------------------------------------------- */}
       <section className="archive-ledger-card">
         {/* Ledger Header */}
         <div className="ledger-header">
           <div className="ledger-title-group">
-            <span className="ledger-eyebrow">CHRONOLOGICAL ARCHIVE</span>
-            <h3 className="ledger-heading">Accomplishment Ledger</h3>
+            <h3 className="ledger-heading">Completed Tasks</h3>
           </div>
           <span className="ledger-counter font-mono">
-            {historyLog ? historyLog.length : 0} RECORDED DAYS
+            {historyLog ? historyLog.length : 0} {historyLog && historyLog.length === 1 ? 'day recorded' : 'days recorded'}
           </span>
         </div>
 
@@ -130,10 +129,10 @@ export default function HistoryLogSection() {
         <div className="ledger-entries-list">
           {(!historyLog || historyLog.length === 0) ? (
             <div className="empty-archive">
-              <Archive size={32} strokeWidth={1.5} className="empty-archive-glyph" />
+              <Archive size={28} strokeWidth={1.5} className="empty-archive-glyph" />
               <div className="empty-archive-text">
-                <h4>No Historical Records Yet</h4>
-                <p>Complete focus tasks on Today to populate your personal accomplishment ledger.</p>
+                <h4>No completed tasks yet</h4>
+                <p>Tasks you finish on Today will be recorded here as your personal log.</p>
               </div>
             </div>
           ) : (
@@ -163,10 +162,10 @@ export default function HistoryLogSection() {
                     aria-expanded={isExpanded}
                   >
                     <div className="date-bar-left">
-                      <span className="date-heading font-mono">{headerDateStr}</span>
+                      <span className="date-heading">{headerDateStr}</span>
                       <div className="date-sub-meta">
                         <span className="date-badge font-mono">
-                          {taskCount} TASK{taskCount === 1 ? '' : 'S'}
+                          {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
                         </span>
                         <span className="duration-stamp font-mono">
                           <Clock size={11} className="clock-icon" /> {formatFocusDuration(totalMins)}
@@ -179,7 +178,7 @@ export default function HistoryLogSection() {
                         type="button"
                         className="delete-record-btn"
                         onClick={(e) => handleDeleteDate(e, dayItem.dateStr)}
-                        title="Delete this date's archive record"
+                        title="Delete record"
                         aria-label={`Delete record for ${headerDateStr}`}
                       >
                         <Trash2 size={13} />
@@ -235,7 +234,7 @@ export default function HistoryLogSection() {
 
       <style>{`
         /* ==========================================================================
-           History & Activity View (Personal Work Record Architecture)
+           Personal Work Record (Editorial + Typographic History)
            ========================================================================== */
         .history-view-container {
           display: flex;
@@ -244,21 +243,22 @@ export default function HistoryLogSection() {
           width: 100%;
         }
 
-        /* 1. Typography-First Statistics Strip */
+        /* 1. Typographic Statistics Strip */
         .stats-typographic-strip {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          box-shadow: var(--shadow-sm);
+          border-radius: var(--radius-sm);
           overflow: hidden;
         }
 
         .stat-metric-cell {
           display: flex;
           flex-direction: column;
-          padding: 1.25rem 1.15rem;
+          align-items: center;
+          justify-content: center;
+          padding: 1.35rem 1rem;
           border-right: 1px solid var(--border-subtle);
           gap: 4px;
         }
@@ -268,70 +268,62 @@ export default function HistoryLogSection() {
         }
 
         .stat-large-val {
-          font-size: 2.35rem;
-          font-weight: 600;
+          font-size: 2.15rem;
+          font-weight: 700;
           color: var(--text-primary);
           line-height: 1;
           letter-spacing: -0.03em;
         }
 
         .stat-label-caps {
-          font-family: var(--font-mono);
+          font-family: var(--font-heading);
           font-size: 0.675rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-weight: 700;
+          letter-spacing: var(--tracking-wide);
+          text-transform: uppercase;
           color: var(--text-muted);
-          margin-top: 2px;
         }
 
-        /* 2. Archival Work History Ledger */
+        /* 3. Archival Ledger Card */
         .archive-ledger-card {
-          display: flex;
-          flex-direction: column;
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-md);
+          border-radius: var(--radius-sm);
           overflow: hidden;
-          box-shadow: var(--shadow-sm);
+          display: flex;
+          flex-direction: column;
         }
 
         .ledger-header {
           display: flex;
-          align-items: flex-start;
+          align-items: center;
           justify-content: space-between;
-          padding: 1.25rem 1.5rem;
-          border-bottom: 1px solid var(--border);
+          padding: 1.15rem 1.35rem;
+          border-bottom: 1px solid var(--border-subtle);
+          background: var(--bg-surface);
         }
 
         .ledger-title-group {
           display: flex;
           flex-direction: column;
-          gap: 3px;
-        }
-
-        .ledger-eyebrow {
-          font-family: var(--font-mono);
-          font-size: 0.675rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          color: var(--text-muted);
+          gap: 2px;
         }
 
         .ledger-heading {
           font-family: var(--font-heading);
           font-size: 1.15rem;
-          font-weight: 600;
+          font-weight: 700;
           color: var(--text-primary);
+          letter-spacing: -0.01em;
         }
 
         .ledger-counter {
           font-size: 0.725rem;
           font-weight: 600;
           color: var(--text-muted);
-          letter-spacing: 0.04em;
         }
 
-        /* Date Blocks */
+        /* Entries List */
         .ledger-entries-list {
           display: flex;
           flex-direction: column;
@@ -345,18 +337,19 @@ export default function HistoryLogSection() {
           border-bottom: none;
         }
 
+        /* Date Header Bar */
         .archive-date-bar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.95rem 1.35rem;
+          padding: 0.85rem 1.35rem;
           background: var(--bg-surface);
           cursor: pointer;
           transition: background-color var(--duration-fast) ease;
         }
 
         .archive-date-bar:hover {
-          background: var(--bg-subtle);
+          background: var(--bg-hover);
         }
 
         .date-bar-left {
@@ -367,33 +360,32 @@ export default function HistoryLogSection() {
         }
 
         .date-heading {
-          font-size: 0.875rem;
+          font-family: var(--font-heading);
+          font-size: 0.85rem;
           font-weight: 600;
-          letter-spacing: 0.04em;
           color: var(--text-primary);
         }
 
         .date-sub-meta {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
         }
 
         .date-badge {
           font-size: 0.675rem;
-          font-weight: 600;
-          padding: 1px 6px;
-          border-radius: var(--radius-xs);
-          background: var(--bg-subtle);
           color: var(--text-secondary);
+          background: var(--bg-subtle);
+          padding: 2px 6px;
+          border-radius: var(--radius-xs);
           border: 1px solid var(--border-subtle);
         }
 
         .duration-stamp {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          font-size: 0.7rem;
+          gap: 3px;
+          font-size: 0.675rem;
           color: var(--text-muted);
         }
 
@@ -404,14 +396,15 @@ export default function HistoryLogSection() {
         .date-bar-right {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
 
         .delete-record-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 4px;
+          width: 24px;
+          height: 24px;
           background: transparent;
           border: none;
           color: var(--text-faint);
@@ -428,60 +421,41 @@ export default function HistoryLogSection() {
         .expand-indicator {
           color: var(--text-muted);
           display: flex;
+          align-items: center;
         }
 
-        /* Historical Tasks Table */
+        /* Task rows */
         .archive-tasks-table {
           display: flex;
           flex-direction: column;
-          background: #FAF8F5;
+          background: var(--bg-subtle);
           border-top: 1px solid var(--border-subtle);
-          animation: tableExpand var(--duration-fast) var(--ease-tactile);
-        }
-
-        @keyframes tableExpand {
-          from {
-            opacity: 0;
-            transform: translateY(-3px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
         }
 
         .archive-task-row {
           display: flex;
           align-items: center;
-          padding: 0.65rem 1.35rem 0.65rem 1.85rem;
+          justify-content: space-between;
+          padding: 0.65rem 1.35rem 0.65rem 2.25rem;
           border-bottom: 1px solid var(--border-subtle);
           gap: 12px;
-          transition: background-color var(--duration-fast) ease;
         }
 
         .archive-task-row:last-child {
           border-bottom: none;
         }
 
-        .archive-task-row:hover {
-          background: #F5F1EB;
-        }
-
         .task-status-mark {
-          display: inline-flex;
+          display: flex;
           align-items: center;
           justify-content: center;
-          width: 16px;
-          height: 16px;
-          border-radius: 1px;
+          width: 15px;
+          height: 15px;
+          border-radius: var(--radius-xs);
           background: var(--success-light);
           color: var(--success);
           border: 1px solid var(--success-border);
           flex-shrink: 0;
-        }
-
-        .check-mark-icon {
-          stroke-width: 2.5;
         }
 
         .task-main-cell {
@@ -490,10 +464,9 @@ export default function HistoryLogSection() {
         }
 
         .task-title-text {
-          font-size: 0.875rem;
-          font-weight: 500;
+          font-family: var(--font-heading);
+          font-size: 0.85rem;
           color: var(--text-primary);
-          line-height: 1.35;
           word-break: break-word;
         }
 
@@ -535,7 +508,7 @@ export default function HistoryLogSection() {
 
         .empty-archive-text h4 {
           font-family: var(--font-heading);
-          font-size: 1.05rem;
+          font-size: 1rem;
           font-weight: 600;
           color: var(--text-primary);
         }
@@ -545,56 +518,22 @@ export default function HistoryLogSection() {
           color: var(--text-muted);
         }
 
-        /* Responsive */
         @media (max-width: 680px) {
           .stats-typographic-strip {
             grid-template-columns: repeat(2, 1fr);
           }
-
-          .stat-metric-cell {
-            padding: 1rem 0.85rem;
-          }
-
-          .stat-large-val {
-            font-size: clamp(1.65rem, 6vw, 2.1rem);
-          }
-
           .stat-metric-cell:nth-child(2) {
             border-right: none;
           }
-
           .stat-metric-cell:nth-child(1),
           .stat-metric-cell:nth-child(2) {
             border-bottom: 1px solid var(--border-subtle);
           }
-
-          .ledger-header {
-            padding: 1rem 1.15rem;
+          .stat-large-val {
+            font-size: 1.75rem;
           }
-
-          .archive-date-bar {
-            padding: 0.85rem 1rem;
-          }
-
-          .delete-record-btn {
-            min-width: 30px;
-            min-height: 30px;
-          }
-
           .archive-task-row {
-            flex-wrap: wrap;
-            padding: 0.75rem 1rem;
-            gap: 6px;
-          }
-
-          .task-main-cell {
-            width: calc(100% - 28px);
-          }
-
-          .task-meta-cell {
-            width: 100%;
-            padding-left: 28px;
-            justify-content: flex-start;
+            padding: 0.65rem 1rem 0.65rem 1.25rem;
           }
         }
       `}</style>

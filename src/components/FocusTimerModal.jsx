@@ -52,18 +52,16 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Focus Timer">
-      <div className="focus-instrument-card" onClick={(e) => e.stopPropagation()}>
-        {/* Instrument Status Bar */}
-        <div className="instrument-top-bar">
-          <div className="status-label-group">
-            <span className="instrument-tag">FOCUS INSTRUMENT</span>
-            <span className="instrument-pipe">/</span>
-            <span className="category-meta">{task.category ? task.category.toUpperCase() : 'FOCUS'}</span>
-          </div>
+      <div className="focus-modal-card" onClick={(e) => e.stopPropagation()}>
+        {/* Top Status Bar */}
+        <div className="focus-top-bar">
+          <span className="focus-badge badge">
+            {task.category || 'Focus'}
+          </span>
 
           <button
             type="button"
-            className="instrument-close-btn"
+            className="focus-close-btn"
             onClick={onClose}
             aria-label="Close focus timer"
             title="Close timer (Esc)"
@@ -72,10 +70,10 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           </button>
         </div>
 
-        {/* Primary Time Display Block */}
+        {/* Primary Time Display */}
         <div className="timer-main-display">
           <span className="session-eyebrow">
-            SESSION DURATION · {targetMinutes}M TARGET
+            Session · {targetMinutes} min target
           </span>
 
           <div className="clock-digits-wrap" aria-live="polite">
@@ -84,45 +82,45 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
 
           <div className="timer-status-row">
             {secondsLeft === 0 ? (
-              <span className="status-badge finished">✓ TARGET REACHED</span>
+              <span className="status-badge finished">Completed</span>
             ) : isRunning ? (
               <span className="status-badge running">
                 <span className="pulsing-pip" aria-hidden="true" />
-                ACTIVE FOCUS SESSION
+                Focusing
               </span>
             ) : (
-              <span className="status-badge paused">❚❚ PAUSED</span>
+              <span className="status-badge paused">Paused</span>
             )}
           </div>
         </div>
 
-        {/* Restrained Precision Rail Progress Indicator */}
-        <div className="instrument-progress-section">
+        {/* Restrained Rail Progress Indicator */}
+        <div className="timer-progress-section">
           <div className="progress-labels">
-            <span className="mono-stat">{progressPercent}% ELAPSED</span>
-            <span className="mono-stat">{formatTime(secondsLeft)} REMAINING</span>
+            <span><strong className="font-mono">{progressPercent}%</strong> elapsed</span>
+            <span><strong className="font-mono">{formatTime(secondsLeft)}</strong> left</span>
           </div>
-          <div className="instrument-rail" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100}>
-            <div className="instrument-rail-fill" style={{ width: `${progressPercent}%` }} />
+          <div className="timer-rail" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100}>
+            <div className="timer-rail-fill" style={{ width: `${progressPercent}%` }} />
           </div>
         </div>
 
-        {/* Thin Separator Rule */}
-        <hr className="instrument-rule" />
+        {/* Separator Rule */}
+        <hr className="timer-rule" />
 
-        {/* Current Task Context Section */}
+        {/* Current Task Context */}
         <div className="current-task-context">
-          <span className="task-context-label">CURRENT TARGET ENTRY</span>
+          <span className="task-context-label">Current task</span>
           <h3 className="current-task-title">{task.title}</h3>
         </div>
 
-        {/* Restrained Action Controls */}
-        <div className="instrument-controls-row">
+        {/* Action Controls */}
+        <div className="timer-controls-row">
           <button
             type="button"
             className="control-btn secondary"
             onClick={handleReset}
-            title="Reset timer to target duration"
+            title="Reset timer"
           >
             <RotateCcw size={14} /> Reset
           </button>
@@ -131,15 +129,15 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
             type="button"
             className={`control-btn ${isRunning ? 'active-toggle' : 'primary-toggle'}`}
             onClick={() => setIsRunning(!isRunning)}
-            title={isRunning ? 'Pause focus timer' : 'Resume focus timer'}
+            title={isRunning ? 'Pause timer' : 'Resume timer'}
           >
             {isRunning ? (
               <>
-                <Pause size={14} /> Pause Focus
+                <Pause size={14} /> Pause
               </>
             ) : (
               <>
-                <Play size={14} /> Resume Focus
+                <Play size={14} /> Start
               </>
             )}
           </button>
@@ -148,23 +146,20 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
             type="button"
             className="control-btn complete"
             onClick={handleComplete}
-            title="Mark task completed and finish session"
+            title="Mark completed"
           >
-            <Check size={14} /> Complete Task
+            <Check size={14} /> Complete
           </button>
         </div>
       </div>
 
       <style>{`
-        /* ==========================================================================
-           Focus Timer Instrument Card (Serious, Quiet, Calibrated)
-           ========================================================================== */
-        .focus-instrument-card {
+        .focus-modal-card {
           width: 90%;
-          max-width: 460px;
+          max-width: 440px;
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-md);
+          border-radius: var(--radius-sm);
           padding: 1.75rem;
           box-shadow: var(--shadow-modal);
           display: flex;
@@ -174,114 +169,84 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           animation: modalSettle var(--duration-fast) var(--ease-tactile);
         }
 
-        /* Top Status Bar */
-        .instrument-top-bar {
+        .focus-top-bar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding-bottom: 0.75rem;
-          border-bottom: 1px solid var(--border-subtle);
         }
 
-        .status-label-group {
-          display: flex;
-          align-items: center;
-          gap: 6px;
+        .focus-badge {
+          font-size: 0.725rem;
+          font-weight: 600;
         }
 
-        .instrument-tag {
-          font-family: var(--font-mono);
-          font-size: 0.6875rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          color: var(--text-primary);
-        }
-
-        .instrument-pipe {
-          color: var(--text-faint);
-          font-size: 0.7rem;
-        }
-
-        .category-meta {
-          font-family: var(--font-mono);
-          font-size: 0.675rem;
-          color: var(--text-muted);
-          letter-spacing: 0.04em;
-        }
-
-        .instrument-close-btn {
+        .focus-close-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           background: transparent;
-          border: 1px solid transparent;
+          border: none;
           color: var(--text-muted);
           border-radius: var(--radius-xs);
           cursor: pointer;
           transition: all var(--duration-fast) ease;
         }
 
-        .instrument-close-btn:hover {
+        .focus-close-btn:hover {
           color: var(--text-primary);
           background: var(--bg-hover);
-          border-color: var(--border-subtle);
         }
 
-        /* Main Time Block */
+        /* Timer Display */
         .timer-main-display {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
+          gap: 8px;
           padding: 0.5rem 0;
         }
 
         .session-eyebrow {
-          font-family: var(--font-mono);
-          font-size: 0.6875rem;
+          font-family: var(--font-heading);
+          font-size: 0.75rem;
           font-weight: 600;
-          letter-spacing: 0.08em;
           color: var(--text-muted);
+          letter-spacing: var(--tracking-wide);
+          text-transform: uppercase;
         }
 
         .clock-digits-wrap {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0.5rem 0;
         }
 
         .clock-digits {
-          font-family: var(--font-mono);
-          font-size: 4.75rem;
-          font-weight: 500;
-          line-height: 1;
-          letter-spacing: -0.03em;
+          font-size: 3.75rem;
+          font-weight: 700;
+          letter-spacing: -0.04em;
           color: var(--text-primary);
-          font-feature-settings: "tnum";
-          font-variant-numeric: tabular-nums;
+          line-height: 1;
         }
 
         .timer-status-row {
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-top: 4px;
         }
 
         .status-badge {
           display: inline-flex;
           align-items: center;
-          gap: 5px;
-          font-family: var(--font-mono);
-          font-size: 0.7rem;
+          gap: 6px;
+          font-family: var(--font-heading);
+          font-size: 0.75rem;
           font-weight: 600;
-          letter-spacing: 0.06em;
-          padding: 2px 7px;
+          padding: 3px 8px;
           border-radius: var(--radius-xs);
-          border: 1px solid var(--border-subtle);
+          border: 1px solid var(--border);
           background: var(--bg-subtle);
           color: var(--text-secondary);
         }
@@ -292,25 +257,25 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           border-color: var(--accent-border);
         }
 
-        .pulsing-pip {
-          width: 5px;
-          height: 5px;
-          background: var(--accent);
-          border-radius: 0;
-        }
-
-        .status-badge.paused {
-          color: var(--text-muted);
-        }
-
         .status-badge.finished {
           color: var(--success);
           background: var(--success-light);
           border-color: var(--success-border);
         }
 
-        /* Precision Progress Rail */
-        .instrument-progress-section {
+        .status-badge.paused {
+          color: var(--text-muted);
+        }
+
+        .pulsing-pip {
+          width: 5px;
+          height: 5px;
+          border-radius: 1px;
+          background: var(--accent);
+        }
+
+        /* Progress Rail */
+        .timer-progress-section {
           display: flex;
           flex-direction: column;
           gap: 6px;
@@ -320,47 +285,52 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          font-size: 0.6875rem;
+          font-family: var(--font-heading);
+          font-size: 0.725rem;
           color: var(--text-muted);
         }
 
-        .instrument-rail {
+        .progress-labels strong {
+          color: var(--text-primary);
+        }
+
+        .timer-rail {
           width: 100%;
-          height: 4px;
+          height: 3px;
           background: var(--bg-surface-sunken);
-          border-radius: var(--radius-none);
+          border-radius: 1px;
           overflow: hidden;
         }
 
-        .instrument-rail-fill {
+        .timer-rail-fill {
           height: 100%;
           background: var(--accent);
-          transition: width var(--duration-normal) var(--ease-tactile);
+          transition: width 0.3s ease;
         }
 
-        /* Dividing Rule */
-        .instrument-rule {
+        .timer-rule {
           width: 100%;
           height: 1px;
-          border: none;
           background: var(--border-subtle);
-          margin: 0;
+          border: none;
+          margin: 0.25rem 0;
         }
 
-        /* Current Task Section */
+        /* Task Context */
         .current-task-context {
           display: flex;
           flex-direction: column;
           gap: 4px;
-          text-align: left;
+          text-align: center;
         }
 
         .task-context-label {
-          font-family: var(--font-mono);
-          font-size: 0.675rem;
+          font-family: var(--font-heading);
+          font-size: 0.725rem;
           font-weight: 600;
-          letter-spacing: 0.08em;
           color: var(--text-muted);
+          letter-spacing: var(--tracking-wide);
+          text-transform: uppercase;
         }
 
         .current-task-title {
@@ -372,12 +342,12 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           word-break: break-word;
         }
 
-        /* Controls Row */
-        .instrument-controls-row {
+        /* Action Controls */
+        .timer-controls-row {
           display: grid;
-          grid-template-columns: 1fr 1.3fr 1.3fr;
+          grid-template-columns: 1fr 1.35fr 1fr;
           gap: 8px;
-          margin-top: 0.25rem;
+          padding-top: 4px;
         }
 
         .control-btn {
@@ -386,34 +356,29 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           justify-content: center;
           gap: 6px;
           padding: 8px 12px;
-          border-radius: var(--radius-sm);
+          border-radius: var(--radius-xs);
           font-family: var(--font-heading);
           font-size: 0.8125rem;
           font-weight: 600;
           cursor: pointer;
-          transition: all var(--duration-fast) var(--ease-tactile);
-          border: 1px solid var(--border);
-        }
-
-        .control-btn:active {
-          transform: translateY(1px);
+          transition: all var(--duration-fast) ease;
         }
 
         .control-btn.secondary {
-          background: var(--bg-surface);
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
           color: var(--text-secondary);
         }
 
         .control-btn.secondary:hover {
           background: var(--bg-hover);
           color: var(--text-primary);
-          border-color: var(--border-strong);
         }
 
         .control-btn.primary-toggle {
           background: var(--text-primary);
           color: var(--text-inverse);
-          border-color: var(--text-primary);
+          border: 1px solid var(--text-primary);
         }
 
         .control-btn.primary-toggle:hover {
@@ -423,41 +388,34 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
 
         .control-btn.active-toggle {
           background: var(--bg-subtle);
+          border: 1px solid var(--border-strong);
           color: var(--text-primary);
-          border-color: var(--border-base);
         }
 
         .control-btn.active-toggle:hover {
           background: var(--bg-hover);
-          border-color: var(--border-strong);
         }
 
         .control-btn.complete {
           background: var(--accent);
           color: white;
-          border-color: var(--accent);
+          border: 1px solid var(--accent);
         }
 
         .control-btn.complete:hover {
           background: var(--accent-hover);
-          border-color: var(--accent-hover);
         }
 
         @media (max-width: 480px) {
-          .focus-instrument-card {
-            padding: 1.35rem 1.15rem;
-            width: 94%;
+          .focus-modal-card {
+            padding: 1.25rem;
           }
           .clock-digits {
-            font-size: clamp(2.85rem, 15vw, 3.75rem);
+            font-size: 3rem;
           }
-          .instrument-controls-row {
+          .timer-controls-row {
             grid-template-columns: 1fr;
-            gap: 8px;
-          }
-          .control-btn {
-            min-height: 44px;
-            font-size: 0.85rem;
+            gap: 6px;
           }
         }
       `}</style>

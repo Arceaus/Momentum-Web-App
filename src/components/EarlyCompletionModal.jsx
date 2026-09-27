@@ -11,35 +11,32 @@ export default function EarlyCompletionModal({ task, remainingMinutes, onConfirm
         </div>
 
         <div className="early-modal-text-group">
-          <h3 className="early-modal-title">Focus Time Remaining</h3>
+          <h3 className="early-modal-title">Mark complete early?</h3>
           <div className="remaining-chip">
             <Clock size={12} />
             <span>
-              <strong>{remainingMinutes} minute{remainingMinutes === 1 ? '' : 's'}</strong> remaining in target session
+              <strong className="font-mono">{remainingMinutes}m</strong> remaining in estimate
             </span>
           </div>
           <p className="early-modal-desc">
-            You are logging <strong>"{task.title}"</strong> as complete early. Confirm whether this focus objective is fully accomplished.
+            You still have estimated time left on <strong>"{task.title}"</strong>. Is this task finished?
           </p>
         </div>
 
         <div className="early-modal-actions">
           <button type="button" className="btn-modal-cancel" onClick={onCancel}>
-            <ArrowLeft size={14} /> Resume Focus
+            <ArrowLeft size={14} /> Keep focusing
           </button>
           
           <button type="button" className="btn-modal-confirm" onClick={onConfirm}>
-            <Check size={14} /> Confirm Completion
+            <Check size={14} /> Mark completed
           </button>
         </div>
       </div>
 
       <style>{`
-        /* ==========================================================================
-           Early Completion Modal (Serious, Restrained, Utilitarian)
-           ========================================================================== */
         .early-modal-card {
-          max-width: 420px;
+          max-width: 400px;
           width: 90%;
           display: flex;
           flex-direction: column;
@@ -49,7 +46,7 @@ export default function EarlyCompletionModal({ task, remainingMinutes, onConfirm
           text-align: center;
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-md);
+          border-radius: var(--radius-sm);
           box-shadow: var(--shadow-modal);
           animation: modalSettle var(--duration-fast) var(--ease-tactile);
         }
@@ -75,7 +72,7 @@ export default function EarlyCompletionModal({ task, remainingMinutes, onConfirm
 
         .early-modal-title {
           font-family: var(--font-heading);
-          font-size: 1.25rem;
+          font-size: 1.2rem;
           font-weight: 700;
           color: var(--text-primary);
         }
@@ -88,9 +85,8 @@ export default function EarlyCompletionModal({ task, remainingMinutes, onConfirm
           color: var(--warning);
           padding: 3px 8px;
           border-radius: var(--radius-xs);
-          font-family: var(--font-mono);
-          font-size: 0.725rem;
-          font-weight: 500;
+          font-size: 0.75rem;
+          font-weight: 600;
           border: 1px solid var(--warning-border);
         }
 
@@ -98,60 +94,27 @@ export default function EarlyCompletionModal({ task, remainingMinutes, onConfirm
           font-size: 0.875rem;
           color: var(--text-secondary);
           line-height: 1.5;
-          margin-top: 4px;
         }
 
         .early-modal-actions {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
+          display: flex;
+          align-items: center;
           gap: 8px;
           width: 100%;
-          margin-top: 0.25rem;
-        }
-
-        .btn-modal-cancel {
-          display: inline-flex;
-          align-items: center;
           justify-content: center;
-          gap: 6px;
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          color: var(--text-secondary);
-          padding: 8px 12px;
-          border-radius: var(--radius-sm);
-          font-family: var(--font-heading);
-          font-size: 0.8125rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all var(--duration-fast) ease;
         }
 
-        .btn-modal-cancel:hover {
-          background: var(--bg-hover);
-          color: var(--text-primary);
-          border-color: var(--border-strong);
+        .early-modal-actions button {
+          flex: 1;
         }
 
-        .btn-modal-confirm {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          background: var(--text-primary);
-          border: 1px solid var(--text-primary);
-          color: var(--text-inverse);
-          padding: 8px 12px;
-          border-radius: var(--radius-sm);
-          font-family: var(--font-heading);
-          font-size: 0.8125rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all var(--duration-fast) ease;
-        }
-
-        .btn-modal-confirm:hover {
-          background: var(--accent);
-          border-color: var(--accent);
+        @media (max-width: 480px) {
+          .early-modal-actions {
+            flex-direction: column;
+          }
+          .early-modal-actions button {
+            width: 100%;
+          }
         }
       `}</style>
     </div>

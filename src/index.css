@@ -172,28 +172,28 @@
    Optional Dark Palette (Architectural Drafting Slate)
    ---------------------------------------------------------------------------- */
 [data-theme="dark"] {
-  --bg-app: #141312;
-  --bg-surface: #1C1B19;
-  --bg-surface-elevated: #22201D;
-  --bg-surface-sunken: #100F0E;
-  --bg-surface-solid: #1C1B19;
-  --bg-subtle: #242220;
-  --bg-hover: #2C2A27;
-  --bg-active: #35322E;
+  --bg-app: #181716;
+  --bg-surface: #22201D;
+  --bg-surface-elevated: #2A2824;
+  --bg-surface-sunken: #141312;
+  --bg-surface-solid: #22201D;
+  --bg-subtle: #262421;
+  --bg-hover: #2E2B27;
+  --bg-active: #38342F;
 
-  --text-primary: #EDEBE8;
-  --text-main: #EDEBE8;
-  --text-secondary: #9E988E;
-  --text-muted: #736E65;
-  --text-faint: #4E4A44;
-  --text-inverse: #141312;
+  --text-primary: #F0ECE1;
+  --text-main: #F0ECE1;
+  --text-secondary: #ADA79B;
+  --text-muted: #7E776C;
+  --text-faint: #544E45;
+  --text-inverse: #181716;
 
-  --border-subtle: #282623;
-  --border: #38342E;
-  --border-strong: #EDEBE8;
-  --border-light: #33302B;
-  --border-base: #444039;
-  --border-glass: #33302B;
+  --border-subtle: #2A2824;
+  --border: #36332D;
+  --border-strong: #544E45;
+  --border-light: #2E2B25;
+  --border-base: #3E3A33;
+  --border-glass: #36332D;
 
   --accent: #D95D39;
   --accent-primary: #D95D39;
@@ -202,16 +202,40 @@
   --accent-light: rgba(217, 93, 57, 0.15);
   --accent-border: rgba(217, 93, 57, 0.35);
 
-  --gh-0: #201E1B;
-  --gh-1: #38342E;
-  --gh-2: #5E584E;
-  --gh-3: #8C8374;
+  --gh-0: #262421;
+  --gh-1: #3E3A33;
+  --gh-2: #655E53;
+  --gh-3: #968D7D;
   --gh-4: #D95D39;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.4);
-  --shadow-elevated: 0 6px 18px rgba(0, 0, 0, 0.5);
-  --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.7);
+  --badge-focus-bg: #2C221D;
+  --badge-focus-text: #E5835F;
+  --badge-focus-border: #4A3328;
+
+  --badge-work-bg: #1C262C;
+  --badge-work-text: #6BA3BE;
+  --badge-work-border: #2B3D47;
+
+  --badge-creative-bg: #2C1F25;
+  --badge-creative-text: #D47B95;
+  --badge-creative-border: #4A303C;
+
+  --badge-personal-bg: #2C281D;
+  --badge-personal-text: #D5B460;
+  --badge-personal-border: #4A412A;
+
+  --badge-health-bg: #1B2820;
+  --badge-health-text: #68B682;
+  --badge-health-border: #294232;
+
+  --badge-reading-bg: #262421;
+  --badge-reading-text: #BDB6A8;
+  --badge-reading-border: #3E3A33;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-elevated: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.6);
 }
 
 /* ==========================================================================
@@ -322,11 +346,11 @@ p {
 }
 
 .label-caps {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
+  letter-spacing: var(--tracking-wide);
   color: var(--text-muted);
 }
 
@@ -497,8 +521,8 @@ button {
   color: var(--text-secondary) !important;
   padding: 3px 8px !important;
   border-radius: var(--radius-xs) !important;
-  font-family: var(--font-mono) !important;
-  font-size: 0.7rem !important;
+  font-family: var(--font-heading) !important;
+  font-size: 0.75rem !important;
   font-weight: 600 !important;
   box-shadow: none !important;
   transition: all var(--duration-fast) var(--ease-tactile);
@@ -538,7 +562,19 @@ button {
 }
 
 /* Segmented Filter & Duration Controls */
-.filter-pill,
+.filter-pill {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+  padding: 4px 10px !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--font-heading) !important;
+  font-size: 0.775rem !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  transition: all var(--duration-fast) var(--ease-tactile);
+}
+
 .dur-pill {
   background: var(--bg-surface) !important;
   border: 1px solid var(--border) !important;
@@ -763,7 +799,22 @@ textarea:focus,
    Badges, Chips & Meta Labels (Restrained Editorial Inks)
    ========================================================================== */
 
-.badge,
+.badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-family: var(--font-heading) !important;
+  font-size: 0.725rem !important;
+  font-weight: 600 !important;
+  padding: 2px 7px !important;
+  border-radius: var(--radius-xs) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-subtle) !important;
+  color: var(--text-secondary) !important;
+  box-shadow: none !important;
+  letter-spacing: 0.01em !important;
+}
+
 .date-chip,
 .atmosphere-chip,
 .header-badge,

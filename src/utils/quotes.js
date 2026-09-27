@@ -15,28 +15,20 @@ export const CLAUDE_STYLE_GREETINGS = [
 
 export const ALL_DONE_MESSAGES = [
   {
-    title: "Everything completed 🎉",
-    subtitle: "You're done for today. Nice work. Go enjoy the rest of your day."
+    title: "All done for today.",
+    subtitle: "You completed all your planned tasks. Take time to step back and recharge."
   },
   {
-    title: "All tasks accomplished! ✨",
-    subtitle: "You've built peak momentum today. Step back, relax, and recharge."
+    title: "Everything completed.",
+    subtitle: "A quiet, productive day. Rest well for tomorrow."
   },
   {
-    title: "Outstanding focus! 🌟",
-    subtitle: "Every single item checked off. Take a deep breath and enjoy your free time."
+    title: "All tasks checked off.",
+    subtitle: "Your commitments for today are fulfilled. Enjoy your evening."
   },
   {
-    title: "Daily goals crushed! 💪",
-    subtitle: "Flawless execution today. Your momentum activity graph is glowing."
-  },
-  {
-    title: "Mastery in motion! 🚀",
-    subtitle: "You completed everything you set out to do today. Rest up for tomorrow!"
-  },
-  {
-    title: "Day complete! ☕",
-    subtitle: "No remaining tasks. Time to kick back and savor your accomplishments."
+    title: "Day complete.",
+    subtitle: "Steady, intentional progress. Well done."
   }
 ];
 
