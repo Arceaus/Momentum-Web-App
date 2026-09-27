@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Flame, Calendar, CheckCircle, TrendingUp, Award, X } from 'lucide-react';
+import { Flame, Calendar, CheckCircle, X } from 'lucide-react';
 
 export default function ActivityView() {
   const { activityLog, totalProductiveDays, totalCompletedAllTime } = useApp();
@@ -49,7 +49,6 @@ export default function ActivityView() {
 
   // Calculate Streak
   let streak = 0;
-  const todayStr = new Date(2026, 7, 30).toISOString().split('T')[0];
   let checkDate = new Date(2026, 7, 30);
   while (true) {
     const ds = checkDate.toISOString().split('T')[0];
