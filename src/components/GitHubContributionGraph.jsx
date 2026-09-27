@@ -21,12 +21,12 @@ export default function GitHubContributionGraph() {
     const score = typeof rawEntry === 'object' ? (rawEntry.score || 0) : count * 30;
     const minutes = typeof rawEntry === 'object' ? (rawEntry.minutes || 0) : count * 20;
 
-    // Hybrid Effort Level Thresholds
+    // Archival Effort Density Ranks (0 to 4)
     let lvl = 0;
-    if (score >= 150) lvl = 4;      // Peak Neon Green (e.g. 2h+ deep focus or 5+ tasks)
-    else if (score >= 75) lvl = 3;  // Vibrant Green (~1.5h focus)
-    else if (score >= 35) lvl = 2;  // Medium Green (~45m-1h focus)
-    else if (score >= 1) lvl = 1;   // Light Green (1 task or ~20m focus)
+    if (score >= 150) lvl = 4;      // Peak terracotta mark (2h+ deep focus or 5+ tasks)
+    else if (score >= 75) lvl = 3;  // Heavy carbon ink (~1.5h focus)
+    else if (score >= 35) lvl = 2;  // Medium graphite wash (~45m-1h focus)
+    else if (score >= 1) lvl = 1;   // Light graphite tint (1 task or ~20m focus)
 
     daysArray.push({
       dateStr,
@@ -68,36 +68,41 @@ export default function GitHubContributionGraph() {
   }
 
   return (
-    <div className="github-graph-card glass-card">
-      {/* Header */}
-      <div className="graph-header">
-        <div className="graph-title-group">
-          <h3 className="graph-main-title">
-            {totalCompletedAllTime} contribution{totalCompletedAllTime === 1 ? '' : 's'} in the last year
+    <div className="activity-chronicle-card" aria-label="Activity Contribution Tracker">
+      {/* Section Header */}
+      <div className="chronicle-header">
+        <div className="chronicle-title-group">
+          <span className="chronicle-eyebrow">CHRONICLE // ANNUAL EFFORT</span>
+          <h3 className="chronicle-title">
+            <span className="mono-stat font-mono">{totalCompletedAllTime}</span> contributions in the past year
           </h3>
-          <span className="graph-sub-title">Momentum activity tracker</span>
         </div>
 
-        <div className="graph-meta-chips">
-          <div className="meta-chip">
-            <Calendar size={13} className="chip-icon green" />
-            <span><strong>{totalProductiveDays}</strong> productive days</span>
+        <div className="chronicle-telemetry">
+          <div className="telemetry-chip">
+            <Calendar size={12} className="chip-icon" />
+            <span className="chip-text">
+              <strong>{totalProductiveDays}</strong> productive days
+            </span>
           </div>
-          <div className="meta-chip">
-            <Flame size={13} className="chip-icon orange" />
-            <span><strong>{streak} day</strong> streak</span>
+
+          <div className="telemetry-chip streak">
+            <Flame size={12} className="chip-icon flame" />
+            <span className="chip-text">
+              <strong>{streak}d</strong> streak
+            </span>
           </div>
         </div>
       </div>
 
       {/* Contribution Grid */}
-      <div className="graph-scroll-wrapper">
+      <div className="chronicle-grid-container">
         {/* Month labels top header */}
-        <div className="month-labels-row">
+        <div className="month-labels-strip" aria-hidden="true">
           {monthLabels.map((ml, idx) => (
             <span
               key={idx}
-              className="month-label-item"
+              className="month-label font-mono"
               style={{ gridColumnStart: ml.weekIdx + 1 }}
             >
               {ml.monthName}
@@ -105,21 +110,21 @@ export default function GitHubContributionGraph() {
           ))}
         </div>
 
-        <div className="graph-body">
-          {/* Day labels left column */}
-          <div className="day-labels-column">
+        <div className="grid-body-row">
+          {/* Day of week labels left column */}
+          <div className="weekday-labels-col font-mono" aria-hidden="true">
             <span>Mon</span>
             <span>Wed</span>
             <span>Fri</span>
           </div>
 
-          {/* 52-week Contribution Grid */}
-          <div className="github-grid">
+          {/* 52-week Contribution Cells Grid */}
+          <div className="archival-cells-grid" role="grid" aria-label="Annual contribution density">
             {daysArray.map((day) => {
               const dateFormatted = day.dateObj.toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
-                year: 'numeric'
+                year: 'numeric',
               });
               const tooltipText = `${day.count} task${day.count === 1 ? '' : 's'} (${day.minutes}m focus, ${day.score} effort pts) on ${dateFormatted}`;
 
@@ -129,6 +134,14 @@ export default function GitHubContributionGraph() {
                   className={`gh-square lvl-${day.lvl}`}
                   title={tooltipText}
                   onClick={() => setSelectedDay(day)}
+                  role="gridcell"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setSelectedDay(day);
+                    }
+                  }}
+                  aria-label={tooltipText}
                 />
               );
             })}
@@ -136,64 +149,81 @@ export default function GitHubContributionGraph() {
         </div>
       </div>
 
-      {/* Legend Footer */}
-      <div className="graph-footer">
-        <span className="footer-info">Effort score: Task count (10 pts) + Focus time (1 pt/min)</span>
-        <div className="legend-group">
-          <span className="legend-label">Less</span>
-          <div className="legend-cells">
+      {/* Legend & Scoring Guidance */}
+      <div className="chronicle-footer">
+        <span className="scoring-formula font-mono">
+          Effort formula: 10 pts per task + 1 pt per minute focused
+        </span>
+
+        <div className="legend-strip font-mono">
+          <span className="legend-label">LESS</span>
+          <div className="legend-cells-row" aria-hidden="true">
             <div className="gh-square lvl-0" />
             <div className="gh-square lvl-1" />
             <div className="gh-square lvl-2" />
             <div className="gh-square lvl-3" />
             <div className="gh-square lvl-4" />
           </div>
-          <span className="legend-label">More</span>
+          <span className="legend-label">MORE</span>
         </div>
       </div>
 
       {/* Selected Day Inspector Modal */}
       {selectedDay && (
-        <div className="modal-overlay" onClick={() => setSelectedDay(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>
-                {selectedDay.dateObj.toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric'
-                })}
-              </h3>
-              <button className="close-btn" onClick={() => setSelectedDay(null)}>
-                <X size={18} />
+        <div className="modal-overlay" onClick={() => setSelectedDay(null)} role="dialog" aria-modal="true" aria-label="Day Activity Inspector">
+          <div className="inspector-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="inspector-header">
+              <div className="inspector-title-group">
+                <span className="inspector-eyebrow">ACTIVITY ARCHIVE ENTRY</span>
+                <h4 className="inspector-date">
+                  {selectedDay.dateObj.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </h4>
+              </div>
+
+              <button
+                type="button"
+                className="close-btn"
+                onClick={() => setSelectedDay(null)}
+                aria-label="Close inspector modal"
+              >
+                <X size={15} />
               </button>
             </div>
-            <div className="modal-body">
-              <div className="inspector-stats-grid">
-                <div className="inspector-stat">
-                  <span className="stat-num">{selectedDay.count}</span>
-                  <span className="stat-label">Tasks Done</span>
+
+            <div className="inspector-body">
+              {/* 3 Metric Columns */}
+              <div className="inspector-metrics-grid">
+                <div className="inspector-metric-box">
+                  <span className="metric-val font-mono">{selectedDay.count}</span>
+                  <span className="metric-tag">TASKS COMPLETED</span>
                 </div>
-                <div className="inspector-stat">
-                  <div className="stat-row">
-                    <Clock size={16} className="stat-icon" />
-                    <span className="stat-num">{selectedDay.minutes}m</span>
+
+                <div className="inspector-metric-box">
+                  <div className="metric-row">
+                    <Clock size={14} className="metric-icon" />
+                    <span className="metric-val font-mono">{selectedDay.minutes}m</span>
                   </div>
-                  <span className="stat-label">Focus Time</span>
+                  <span className="metric-tag">FOCUS DURATION</span>
                 </div>
-                <div className="inspector-stat">
-                  <div className="stat-row">
-                    <Zap size={16} className="stat-icon yellow" />
-                    <span className="stat-num">{selectedDay.score}</span>
+
+                <div className="inspector-metric-box">
+                  <div className="metric-row">
+                    <Zap size={14} className="metric-icon accent" />
+                    <span className="metric-val font-mono">{selectedDay.score}</span>
                   </div>
-                  <span className="stat-label">Effort Score</span>
+                  <span className="metric-tag">EFFORT SCORE</span>
                 </div>
               </div>
-              <div className="modal-msg">
+
+              <div className="inspector-note font-mono">
                 {selectedDay.count > 0
-                  ? `Great momentum! You logged ${selectedDay.minutes} minutes of deep focus across ${selectedDay.count} completed task${selectedDay.count === 1 ? '' : 's'}.`
-                  : "No focus activity logged on this date."}
+                  ? `[LOGGED]: ${selectedDay.minutes} minutes of deep focus logged across ${selectedDay.count} task${selectedDay.count === 1 ? '' : 's'}.`
+                  : "[REST DAY]: No focus activity recorded on this calendar date."}
               </div>
             </div>
           </div>
@@ -201,197 +231,290 @@ export default function GitHubContributionGraph() {
       )}
 
       <style>{`
-        .github-graph-card {
+        /* ==========================================================================
+           Activity Chronicle Card (Editorial Archival Density Tracker)
+           ========================================================================== */
+        .activity-chronicle-card {
           display: flex;
           flex-direction: column;
           gap: 1.15rem;
-          margin-top: 0.5rem;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 1.5rem;
+          box-shadow: var(--shadow-sm);
         }
-        .graph-header {
+
+        .chronicle-header {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between;
           flex-wrap: wrap;
           gap: 12px;
+          padding-bottom: 0.85rem;
+          border-bottom: 1px solid var(--border-subtle);
         }
-        .graph-main-title {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: var(--text-main);
+
+        .chronicle-title-group {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
         }
-        .graph-sub-title {
-          font-size: 0.8rem;
+
+        .chronicle-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 0.675rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
           color: var(--text-muted);
         }
-        .graph-meta-chips {
+
+        .chronicle-title {
+          font-family: var(--font-heading);
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        .chronicle-telemetry {
           display: flex;
+          align-items: center;
           gap: 8px;
         }
-        .meta-chip {
+
+        .telemetry-chip {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          background: rgba(30, 36, 48, 0.55);
-          border: var(--border-light);
-          padding: 4px 10px;
-          border-radius: var(--radius-pill);
-          font-size: 0.775rem;
+          gap: 5px;
+          padding: 3px 8px;
+          border-radius: var(--radius-xs);
+          border: 1px solid var(--border);
+          background: var(--bg-subtle);
+          font-family: var(--font-mono);
+          font-size: 0.725rem;
           color: var(--text-secondary);
         }
-        .chip-icon.green { color: var(--gh-3); }
-        .chip-icon.orange { color: #F97316; }
 
-        .graph-scroll-wrapper {
+        .telemetry-chip.streak {
+          background: var(--accent-light);
+          border-color: var(--accent-border);
+          color: var(--accent);
+        }
+
+        .chip-icon {
+          color: var(--text-muted);
+        }
+
+        .chip-icon.flame {
+          color: var(--accent);
+        }
+
+        /* Contribution Grid Scroll Wrapper */
+        .chronicle-grid-container {
           display: flex;
           flex-direction: column;
           gap: 4px;
           overflow-x: auto;
           padding-bottom: 4px;
+          scrollbar-width: thin;
         }
-        .month-labels-row {
+
+        .month-labels-strip {
           display: grid;
           grid-template-columns: repeat(52, 10px);
           gap: 3px;
-          margin-left: 26px;
+          margin-left: 28px;
           height: 16px;
         }
-        .month-label-item {
-          font-size: 0.7rem;
+
+        .month-label {
+          font-size: 0.675rem;
           color: var(--text-muted);
-          font-family: var(--font-body);
+          line-height: 1;
         }
-        .graph-body {
+
+        .grid-body-row {
           display: flex;
-          gap: 8px;
           align-items: center;
+          gap: 8px;
         }
-        .day-labels-column {
+
+        .weekday-labels-col {
           display: flex;
           flex-direction: column;
           justify-content: space-around;
           height: 88px;
-          font-size: 0.675rem;
+          font-size: 0.65rem;
           color: var(--text-muted);
-          width: 18px;
+          width: 20px;
+          line-height: 1;
         }
-        .github-grid {
+
+        .archival-cells-grid {
           display: grid;
           grid-template-rows: repeat(7, 10px);
           grid-auto-flow: column;
           grid-auto-columns: 10px;
           gap: 3px;
         }
-        .gh-square {
-          width: 10px;
-          height: 10px;
-          border-radius: 2px;
-          background-color: var(--gh-0);
-          outline: 1px solid rgba(255, 255, 255, 0.03);
-          transition: transform 0.15s ease, background-color 0.2s ease;
-          cursor: pointer;
-        }
-        .gh-square:hover {
-          transform: scale(1.4);
-          z-index: 10;
-          outline: 1px solid rgba(255, 255, 255, 0.25);
-        }
-        .gh-square.lvl-0 { background-color: #161B22; }
-        .gh-square.lvl-1 { background-color: #0E4429; }
-        .gh-square.lvl-2 { background-color: #006D32; }
-        .gh-square.lvl-3 { background-color: #26A641; }
-        .gh-square.lvl-4 { background-color: #39D353; }
 
-        .graph-footer {
+        /* Cells Ramp */
+        .gh-square {
+          width: 10px !important;
+          height: 10px !important;
+          border-radius: 1px !important;
+          outline: 1px solid rgba(24, 23, 21, 0.08) !important;
+          cursor: pointer;
+          transition: outline-color var(--duration-fast) ease !important;
+        }
+
+        .gh-square:hover {
+          transform: none !important;
+          outline: 1.5px solid var(--border-strong) !important;
+          z-index: 2;
+        }
+
+        .gh-square.lvl-0 { background-color: var(--gh-0) !important; }
+        .gh-square.lvl-1 { background-color: var(--gh-1) !important; }
+        .gh-square.lvl-2 { background-color: var(--gh-2) !important; }
+        .gh-square.lvl-3 { background-color: var(--gh-3) !important; }
+        .gh-square.lvl-4 { background-color: var(--gh-4) !important; }
+
+        /* Footer & Guidance */
+        .chronicle-footer {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding-top: 10px;
-          border-top: var(--border-light);
-          font-size: 0.75rem;
-          color: var(--text-muted);
+          flex-wrap: wrap;
+          gap: 10px;
+          padding-top: 0.85rem;
+          border-top: 1px solid var(--border-subtle);
         }
-        .legend-group {
+
+        .scoring-formula {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          letter-spacing: 0.01em;
+        }
+
+        .legend-strip {
           display: flex;
           align-items: center;
           gap: 6px;
+          font-size: 0.675rem;
+          color: var(--text-muted);
         }
-        .legend-cells {
+
+        .legend-cells-row {
           display: flex;
+          align-items: center;
           gap: 3px;
         }
-        .modal-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-bottom: 1rem;
-          border-bottom: var(--border-light);
-        }
-        .close-btn {
-          background: transparent;
-          border: none;
-          color: var(--text-muted);
-          cursor: pointer;
-          border-radius: 50%;
-          padding: 4px;
-          display: flex;
-        }
-        .close-btn:hover {
-          color: var(--text-main);
-          background: var(--bg-hover);
-        }
-        .modal-body {
-          padding-top: 1.25rem;
+
+        /* Day Activity Inspector Modal */
+        .inspector-panel {
+          width: 90%;
+          max-width: 440px;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          padding: 1.75rem;
+          box-shadow: var(--shadow-modal);
           display: flex;
           flex-direction: column;
-          align-items: center;
           gap: 1.25rem;
-          text-align: center;
         }
-        .inspector-stats-grid {
+
+        .inspector-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .inspector-title-group {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+        }
+
+        .inspector-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 0.675rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          color: var(--text-muted);
+        }
+
+        .inspector-date {
+          font-family: var(--font-heading);
+          font-size: 1.15rem;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        .inspector-body {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .inspector-metrics-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-          width: 100%;
+          gap: 8px;
         }
-        .inspector-stat {
+
+        .inspector-metric-box {
           display: flex;
           flex-direction: column;
           align-items: center;
-          background: rgba(255, 255, 255, 0.04);
-          padding: 10px 8px;
-          border-radius: var(--radius-md);
-          border: var(--border-light);
+          padding: 0.75rem 0.5rem;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-xs);
+          gap: 4px;
         }
-        .stat-num {
-          font-family: var(--font-heading);
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: var(--gh-3);
-          line-height: 1.2;
-        }
-        .stat-row {
-          display: flex;
+
+        .metric-row {
+          display: inline-flex;
           align-items: center;
           gap: 4px;
         }
-        .stat-icon {
-          color: var(--accent-primary);
+
+        .metric-val {
+          font-size: 1.35rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          line-height: 1.1;
         }
-        .stat-icon.yellow {
-          color: #D29922;
+
+        .metric-icon {
+          color: var(--text-muted);
         }
-        .stat-label {
+
+        .metric-icon.accent {
+          color: var(--accent);
+        }
+
+        .metric-tag {
+          font-family: var(--font-mono);
+          font-size: 0.625rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          letter-spacing: 0.06em;
+          text-align: center;
+        }
+
+        .inspector-note {
+          padding: 0.65rem 0.85rem;
+          background: var(--bg-surface-sunken);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-xs);
           font-size: 0.75rem;
           color: var(--text-secondary);
-          margin-top: 2px;
-        }
-        .modal-msg {
-          font-size: 0.875rem;
-          color: var(--text-secondary);
-          background: var(--bg-subtle);
-          padding: 0.8rem 1.2rem;
-          border-radius: var(--radius-md);
-          width: 100%;
+          line-height: 1.45;
         }
       `}</style>
     </div>
