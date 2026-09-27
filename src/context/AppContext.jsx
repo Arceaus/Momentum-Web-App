@@ -270,6 +270,13 @@ export function AppProvider({ children }) {
     showToast('Task removed');
   };
 
+  const updateTask = (id, updatedFields) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updatedFields } : t))
+    );
+    showToast('Task updated', 'info');
+  };
+
   // Delete Date History AND reset GitHub contribution count AND deduct XP earned on that day
   const deleteDateHistory = (dateStr) => {
     const targetHistory = historyLog.find((h) => h.dateStr === dateStr);
@@ -360,6 +367,7 @@ export function AppProvider({ children }) {
         onboardUser,
         logoutUser,
         addTask,
+        updateTask,
         toggleTask,
         deleteTask,
         deleteDateHistory,

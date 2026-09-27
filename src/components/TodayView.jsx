@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp, parseMinutes } from '../context/AppContext';
 import { getRandomCompletionMessage } from '../utils/quotes';
 import GitHubContributionGraph from './GitHubContributionGraph';
 import FocusTimerModal from './FocusTimerModal';
 import EarlyCompletionModal from './EarlyCompletionModal';
-import { Plus, Trash2, Clock, Sparkles, CheckCircle2, Play } from 'lucide-react';
+import { Plus, Trash2, Clock, Check, Play, Edit3, X, CheckCircle2 } from 'lucide-react';
 
 const CATEGORIES = ['Focus', 'Work', 'Creative', 'Personal', 'Health', 'Reading'];
 const DURATION_PRESETS = ['15m', '25m', '45m', '60m', '90m', '120m'];
 
-const CATEGORY_CLASSES = {
-  Focus: 'badge-focus',
-  Work: 'badge-work',
-  Creative: 'badge-creative',
-  Personal: 'badge-personal',
-  Health: 'badge-health',
-  Reading: 'badge-reading',
+const PRIORITY_CONFIG = {
+  high: { label: 'P1', full: 'High', color: 'var(--danger)' },
+  medium: { label: 'P2', full: 'Med', color: 'var(--warning)' },
+  low: { label: 'P3', full: 'Low', color: 'var(--success)' },
 };
 
 export default function TodayView() {
@@ -24,9 +21,10 @@ export default function TodayView() {
     toggleTask,
     deleteTask,
     addTask,
+    updateTask,
     xpPops,
     completedTodayCount,
-    totalTasksToday
+    totalTasksToday,
   } = useApp();
 
   const [filterCategory, setFilterCategory] = useState('All');
@@ -36,21 +34,40 @@ export default function TodayView() {
   const [timeInput, setTimeInput] = useState('25m');
   const [priorityInput, setPriorityInput] = useState('medium');
 
+  // In-place inline edit state
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTitleInput, setEditTitleInput] = useState('');
+
   // Modals state
   const [activeFocusTask, setActiveFocusTask] = useState(null);
   const [earlyTaskGuard, setEarlyTaskGuard] = useState(null);
+
+  const allDone = totalTasksToday > 0 && completedTodayCount === totalTasksToday;
+  const [completionMessage, setCompletionMessage] = useState(() => getRandomCompletionMessage());
+  const prevAllDoneRef = useRef(allDone);
+
+  useEffect(() => {
+    if (allDone && !prevAllDoneRef.current) {
+      setCompletionMessage(getRandomCompletionMessage());
+    }
+    prevAllDoneRef.current = allDone;
+  }, [allDone]);
 
   const filteredTasks = tasks.filter((t) => {
     if (filterCategory === 'All') return true;
     return t.category === filterCategory;
   });
 
+  const progressPercent = totalTasksToday > 0 
+    ? Math.round((completedTodayCount / totalTasksToday) * 100) 
+    : 0;
+
   const handleCreateTask = (e) => {
     e.preventDefault();
     if (!titleInput.trim()) return;
 
     addTask({
-      title: titleInput,
+      title: titleInput.trim(),
       category: categoryInput,
       timeEstimate: timeInput.trim() || '25m',
       priority: priorityInput,
@@ -58,6 +75,26 @@ export default function TodayView() {
 
     setTitleInput('');
     setIsAdding(false);
+  };
+
+  const handleStartEdit = (task) => {
+    setEditingTaskId(task.id);
+    setEditTitleInput(task.title);
+  };
+
+  const handleSaveEdit = (taskId) => {
+    if (editTitleInput.trim()) {
+      if (updateTask) {
+        updateTask(taskId, { title: editTitleInput.trim() });
+      }
+    }
+    setEditingTaskId(null);
+    setEditTitleInput('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTaskId(null);
+    setEditTitleInput('');
   };
 
   const handleCheckClick = (task) => {
@@ -86,225 +123,353 @@ export default function TodayView() {
     toggleTask(task.id);
   };
 
-  const allDone = totalTasksToday > 0 && completedTodayCount === totalTasksToday;
-  const [completionMessage, setCompletionMessage] = useState(getRandomCompletionMessage());
-
-  useEffect(() => {
-    if (allDone) {
-      setCompletionMessage(getRandomCompletionMessage());
-    }
-  }, [allDone, completedTodayCount]);
-
   return (
-    <div className="today-container">
-      {/* Section Header */}
-      <div className="section-header">
-        <div className="title-group">
-          <h2 className="main-title">Today</h2>
-          <span className="task-counter">
-            {completedTodayCount} of {totalTasksToday} completed
-          </span>
+    <div className="work-log-container">
+      {/* ---------------------------------------------------------------------
+         1. Work Log Control Bar & Metrics Header
+         --------------------------------------------------------------------- */}
+      <section className="work-log-header">
+        <div className="header-meta-group">
+          <div className="log-title-row">
+            <h2 className="log-heading">Daily Work Log</h2>
+            <span className="log-rule-tag">TODAY</span>
+          </div>
+
+          {/* Numerical Progress Indicator */}
+          <div className="progress-telemetry">
+            <div className="telemetry-figures">
+              <span className="figure-completed">{String(completedTodayCount).padStart(2, '0')}</span>
+              <span className="figure-slash">/</span>
+              <span className="figure-total">{String(totalTasksToday).padStart(2, '0')}</span>
+              <span className="figure-label">COMPLETED</span>
+            </div>
+            {totalTasksToday > 0 && (
+              <span className="percent-stamp">[{progressPercent}%]</span>
+            )}
+          </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="filter-pills">
+        {/* Category Segmented Strip */}
+        <div className="category-filter-strip" role="toolbar" aria-label="Filter tasks by category">
           <button
-            className={`filter-pill ${filterCategory === 'All' ? 'active' : ''}`}
+            type="button"
+            className={`filter-btn ${filterCategory === 'All' ? 'active' : ''}`}
             onClick={() => setFilterCategory('All')}
           >
-            All
+            All <span className="filter-count">{tasks.length}</span>
           </button>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              className={`filter-pill ${filterCategory === cat ? 'active' : ''}`}
-              onClick={() => setFilterCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const count = tasks.filter((t) => t.category === cat).length;
+            return (
+              <button
+                key={cat}
+                type="button"
+                className={`filter-btn ${filterCategory === cat ? 'active' : ''}`}
+                onClick={() => setFilterCategory(cat)}
+              >
+                {cat}
+                {count > 0 && <span className="filter-count">{count}</span>}
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </section>
 
-      {/* Completion Celebration Banner */}
+      {/* Thin Architectural Rail Progress Bar */}
+      {totalTasksToday > 0 && (
+        <div className="log-progress-rail" aria-hidden="true">
+          <div
+            className="log-progress-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      )}
+
+      {/* ---------------------------------------------------------------------
+         2. Completion Milestone Banner (Restrained, Editorial, Literary)
+         --------------------------------------------------------------------- */}
       {allDone && (
-        <div className="completion-banner">
-          <Sparkles className="sparkle-icon" size={22} />
-          <div>
-            <div className="banner-title">{completionMessage.title}</div>
-            <div className="banner-subtitle">{completionMessage.subtitle}</div>
+        <div className="milestone-banner">
+          <div className="milestone-content">
+            <span className="milestone-eyebrow">MILESTONE ACHIEVED · 100% COMPLETE</span>
+            <h3 className="milestone-title">{completionMessage.title}</h3>
+            <p className="milestone-subtitle">{completionMessage.subtitle}</p>
           </div>
         </div>
       )}
 
-      {/* Task List */}
-      <div className="task-list">
+      {/* ---------------------------------------------------------------------
+         3. Integrated Work Log Ledger (Structured Entries)
+         --------------------------------------------------------------------- */}
+      <section className="ledger-surface" aria-label="Tasks list">
         {filteredTasks.length === 0 ? (
-          <div className="empty-state glass-card">
-            <CheckCircle2 size={38} strokeWidth={1.4} className="empty-icon" />
-            <div className="empty-title">Your workspace is ready</div>
-            <p className="empty-text">Click "+ Add task" below to start your daily focus momentum.</p>
+          <div className="empty-ledger">
+            <CheckCircle2 size={32} strokeWidth={1.5} className="empty-glyph" />
+            <div className="empty-content">
+              <h3 className="empty-title">Console Slate Ready</h3>
+              <p className="empty-desc">
+                {filterCategory === 'All'
+                  ? 'No entries recorded for today yet. Use the entry line below to log your focus targets.'
+                  : `No tasks logged in category "${filterCategory}".`}
+              </p>
+            </div>
           </div>
         ) : (
-          filteredTasks.map((task) => {
-            const hasXpPop = xpPops.some((p) => p.taskId === task.id);
-            const categoryClass = CATEGORY_CLASSES[task.category] || 'badge-focus';
+          <div className="ledger-table" role="list">
+            {filteredTasks.map((task, idx) => {
+              const hasXpPop = xpPops.some((p) => p.taskId === task.id);
+              const priority = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
+              const isEditing = editingTaskId === task.id;
 
-            return (
-              <div
-                key={task.id}
-                className={`task-item ${task.completed ? 'completed' : ''}`}
-              >
-                {/* Floating XP Animation */}
-                {hasXpPop && <div className="xp-pop">+20 XP</div>}
-
-                {/* Priority Dot */}
-                <span
-                  className={`priority-dot priority-${task.priority || 'medium'}`}
-                  title={`Priority: ${task.priority || 'medium'}`}
-                />
-
-                {/* Animated Custom Checkbox */}
-                <button
-                  type="button"
-                  className={`custom-checkbox ${task.completed ? 'checked' : ''}`}
-                  onClick={() => handleCheckClick(task)}
-                  aria-label={`Mark task as ${task.completed ? 'incomplete' : 'complete'}`}
+              return (
+                <article
+                  key={task.id}
+                  className={`ledger-entry ${task.completed ? 'completed' : ''}`}
+                  role="listitem"
                 >
-                  <svg className="check-icon" width="12" height="10" viewBox="0 0 12 10" fill="none">
-                    <path d="M1 5L4.5 8.5L11 1.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
+                  {/* Floating XP Tag */}
+                  {hasXpPop && <span className="xp-pop">+20 XP</span>}
 
-                {/* Task Title */}
-                <span className="task-title" onClick={() => handleCheckClick(task)}>
-                  {task.title}
-                </span>
+                  {/* Entry Index & Checkbox Area */}
+                  <div className="entry-status-cell">
+                    <span className="entry-index">{String(idx + 1).padStart(2, '0')}</span>
 
-                {/* Category Badge, Duration & Focus Action */}
-                <div className="task-meta">
-                  <span className={`badge ${categoryClass}`}>
-                    {task.category}
-                  </span>
-                  {task.timeEstimate && (
-                    <span className="time-tag">
-                      <Clock size={11} />
-                      {task.timeEstimate}
-                    </span>
-                  )}
-
-                  {/* Start Focus Clock Button */}
-                  {!task.completed && (
                     <button
                       type="button"
-                      className="btn-start-focus"
-                      onClick={() => setActiveFocusTask(task)}
-                      title="Start Real-Time Focus Clock"
+                      className={`custom-checkbox ${task.completed ? 'checked' : ''}`}
+                      onClick={() => handleCheckClick(task)}
+                      aria-label={`Mark "${task.title}" as ${task.completed ? 'incomplete' : 'completed'}`}
+                      title={task.completed ? 'Mark incomplete' : 'Mark completed'}
                     >
-                      <Play size={11} /> Focus
+                      <svg className="check-icon" width="11" height="9" viewBox="0 0 11 9" fill="none">
+                        <path
+                          d="M1 4.5L4 7.5L10 1.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="square"
+                          strokeLinejoin="miter"
+                        />
+                      </svg>
                     </button>
-                  )}
 
-                  {/* Delete Button */}
-                  <button
-                    type="button"
-                    className="delete-btn"
-                    onClick={() => deleteTask(task.id)}
-                    title="Delete task"
+                    {/* Priority Stamp Pip */}
+                    <span
+                      className="priority-pip"
+                      style={{ backgroundColor: priority.color }}
+                      title={`Priority: ${priority.full} (${priority.label})`}
+                    />
+                  </div>
+
+                  {/* Primary Title / In-place Editor */}
+                  <div className="entry-body-cell">
+                    {isEditing ? (
+                      <div className="inline-edit-wrapper">
+                        <input
+                          type="text"
+                          className="inline-edit-input"
+                          value={editTitleInput}
+                          onChange={(e) => setEditTitleInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveEdit(task.id);
+                            if (e.key === 'Escape') handleCancelEdit();
+                          }}
+                          autoFocus
+                        />
+                        <div className="inline-edit-actions">
+                          <button
+                            type="button"
+                            className="btn-edit-action save"
+                            onClick={() => handleSaveEdit(task.id)}
+                            title="Save changes (Enter)"
+                          >
+                            <Check size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-edit-action cancel"
+                            onClick={handleCancelEdit}
+                            title="Cancel (Esc)"
+                          >
+                            <X size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className="entry-title-wrap"
+                        onClick={() => handleCheckClick(task)}
+                        title="Click to toggle completion"
+                      >
+                        <span className="entry-title-text">{task.title}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Metadata & Controls Cell */}
+                  <div className="entry-meta-cell">
+                    {/* Compact Category Tag */}
+                    <span className={`badge badge-${task.category ? task.category.toLowerCase() : 'focus'}`}>
+                      {task.category || 'Focus'}
+                    </span>
+
+                    {/* Duration Stamp */}
+                    {task.timeEstimate && (
+                      <span className="time-stamp" title={`Estimated focus: ${task.timeEstimate}`}>
+                        <Clock size={11} className="stamp-icon" />
+                        <span>{task.timeEstimate}</span>
+                      </span>
+                    )}
+
+                    {/* Focus Timer Trigger Button */}
+                    {!task.completed && (
+                      <button
+                        type="button"
+                        className="btn-start-focus"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveFocusTask(task);
+                        }}
+                        title="Start focus timer for this task"
+                      >
+                        <Play size={10} /> Focus
+                      </button>
+                    )}
+
+                    {/* In-place Edit Button */}
+                    {!isEditing && (
+                      <button
+                        type="button"
+                        className="entry-action-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStartEdit(task);
+                        }}
+                        title="Edit task title"
+                      >
+                        <Edit3 size={13} />
+                      </button>
+                    )}
+
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      className="entry-action-btn delete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteTask(task.id);
+                      }}
+                      title="Remove task from today"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+        {/* -------------------------------------------------------------------
+           4. Integrated Entry Composer (Clean, Non-Floating)
+           ------------------------------------------------------------------- */}
+        <div className="entry-composer-area">
+          {isAdding ? (
+            <form className="composer-form" onSubmit={handleCreateTask}>
+              <div className="composer-input-row">
+                <input
+                  type="text"
+                  className="composer-primary-input"
+                  placeholder="Record task title or intention..."
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
+              {/* Duration Presets & Context Row */}
+              <div className="composer-controls-row">
+                <div className="controls-left">
+                  <span className="picker-label">Target Duration:</span>
+                  <div className="duration-segmented">
+                    {DURATION_PRESETS.map((dur) => (
+                      <button
+                        key={dur}
+                        type="button"
+                        className={`dur-pill ${timeInput === dur ? 'active' : ''}`}
+                        onClick={() => setTimeInput(dur)}
+                      >
+                        {dur}
+                      </button>
+                    ))}
+                  </div>
+
+                  <input
+                    type="text"
+                    className="custom-duration-input"
+                    placeholder="25m"
+                    value={timeInput}
+                    onChange={(e) => setTimeInput(e.target.value)}
+                    title="Custom duration (e.g. 35m, 1h, 90m)"
+                  />
+                </div>
+
+                <div className="controls-right">
+                  <select
+                    className="select-control"
+                    value={categoryInput}
+                    onChange={(e) => setCategoryInput(e.target.value)}
+                    title="Task category"
                   >
-                    <Trash2 size={14} />
-                  </button>
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    className="select-control"
+                    value={priorityInput}
+                    onChange={(e) => setPriorityInput(e.target.value)}
+                    title="Task priority level"
+                  >
+                    <option value="high">P1 High</option>
+                    <option value="medium">P2 Medium</option>
+                    <option value="low">P3 Low</option>
+                  </select>
+
+                  <div className="composer-actions">
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => setIsAdding(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn-primary">
+                      <Plus size={14} /> Add Entry
+                    </button>
+                  </div>
                 </div>
               </div>
-            );
-          })
-        )}
-      </div>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className="composer-trigger"
+              onClick={() => setIsAdding(true)}
+            >
+              <Plus size={15} className="trigger-icon" />
+              <span>Record new focus task...</span>
+              <span className="trigger-hint">[+ ADD]</span>
+            </button>
+          )}
+        </div>
+      </section>
 
-      {/* Add Task Form or Trigger */}
-      {isAdding ? (
-        <form className="add-task-card glass-card" onSubmit={handleCreateTask}>
-          <input
-            type="text"
-            className="add-task-input"
-            placeholder="What would you like to achieve today?"
-            value={titleInput}
-            onChange={(e) => setTitleInput(e.target.value)}
-            autoFocus
-          />
-
-          {/* Flexible Duration Preset Pills & Custom Input */}
-          <div className="duration-picker-row">
-            <span className="picker-label"><Clock size={12} /> Target Focus Duration:</span>
-            <div className="duration-pills">
-              {DURATION_PRESETS.map((dur) => (
-                <button
-                  key={dur}
-                  type="button"
-                  className={`dur-pill ${timeInput === dur ? 'active' : ''}`}
-                  onClick={() => setTimeInput(dur)}
-                >
-                  {dur}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="add-task-options">
-            <div className="selectors-group">
-              <select
-                className="category-select"
-                value={categoryInput}
-                onChange={(e) => setCategoryInput(e.target.value)}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                className="category-select"
-                value={priorityInput}
-                onChange={(e) => setPriorityInput(e.target.value)}
-              >
-                <option value="high">🔴 High</option>
-                <option value="medium">🟡 Medium</option>
-                <option value="low">🟢 Low</option>
-              </select>
-
-              <input
-                type="text"
-                className="time-input"
-                placeholder="25m"
-                value={timeInput}
-                onChange={(e) => setTimeInput(e.target.value)}
-                title="Custom Duration (e.g. 35m, 180m, 2h)"
-              />
-            </div>
-            <div className="action-buttons">
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setIsAdding(false)}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary">
-                <Plus size={16} /> Add Task
-              </button>
-            </div>
-          </div>
-        </form>
-      ) : (
-        <button className="add-task-trigger" onClick={() => setIsAdding(true)}>
-          <Plus size={18} />
-          <span>Add task</span>
-        </button>
-      )}
-
-      {/* Real-Time Focus Clock Modal */}
+      {/* ---------------------------------------------------------------------
+         5. Focus & Completion Guard Modals
+         --------------------------------------------------------------------- */}
       {activeFocusTask && (
         <FocusTimerModal
           task={activeFocusTask}
@@ -313,7 +478,6 @@ export default function TodayView() {
         />
       )}
 
-      {/* Early Completion Guard Confirmation Modal */}
       {earlyTaskGuard && (
         <EarlyCompletionModal
           task={earlyTaskGuard.task}
@@ -323,322 +487,570 @@ export default function TodayView() {
         />
       )}
 
-      {/* GitHub Contribution Graph on Home Page */}
+      {/* Contribution Activity Graph on Home Canvas */}
       <GitHubContributionGraph />
 
       <style>{`
-        .today-container {
+        /* ==========================================================================
+           Today Work Log Styles (Editorial + Utilitarian Architecture)
+           ========================================================================== */
+        .work-log-container {
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
+          width: 100%;
         }
-        .section-header {
+
+        /* 1. Header & Telemetry */
+        .work-log-header {
+          display: flex;
+          flex-direction: column;
+          gap: 0.85rem;
+        }
+
+        .header-meta-group {
           display: flex;
           align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
-          gap: 1rem;
-        }
-        .title-group {
-          display: flex;
-          align-items: baseline;
           gap: 12px;
         }
-        .main-title {
-          font-size: 1.85rem;
-          font-weight: 700;
-        }
-        .task-counter {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: var(--text-muted);
-        }
-        .filter-pills {
+
+        .log-title-row {
           display: flex;
-          gap: 6px;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .log-heading {
+          font-family: var(--font-heading);
+          font-size: 1.35rem;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
+        .log-rule-tag {
+          font-family: var(--font-mono);
+          font-size: 0.6875rem;
+          font-weight: 600;
+          padding: 2px 6px;
+          border-radius: var(--radius-xs);
+          background: var(--bg-subtle);
+          color: var(--text-muted);
+          border: 1px solid var(--border-subtle);
+          letter-spacing: 0.05em;
+        }
+
+        .progress-telemetry {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .telemetry-figures {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 3px;
+          font-family: var(--font-mono);
+          font-feature-settings: "tnum";
+        }
+
+        .figure-completed {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        .figure-slash {
+          font-size: 0.9rem;
+          color: var(--text-faint);
+        }
+
+        .figure-total {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: var(--text-secondary);
+        }
+
+        .figure-label {
+          font-size: 0.675rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          color: var(--text-muted);
+          margin-left: 4px;
+        }
+
+        .percent-stamp {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--accent);
+        }
+
+        /* Category Filter Segmented Strip */
+        .category-filter-strip {
+          display: flex;
+          align-items: center;
+          gap: 4px;
           overflow-x: auto;
           padding-bottom: 2px;
+          scrollbar-width: none;
         }
-        .filter-pill {
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 4px 12px;
-          border-radius: var(--radius-pill);
-          font-family: var(--font-body);
-          font-size: 0.8rem;
+
+        .category-filter-strip::-webkit-scrollbar {
+          display: none;
+        }
+
+        .filter-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          color: var(--text-muted);
+          padding: 4px 10px;
+          border-radius: var(--radius-sm);
+          font-family: var(--font-mono);
+          font-size: 0.725rem;
           font-weight: 500;
-          color: var(--text-secondary);
           cursor: pointer;
-          transition: all 0.2s ease;
+          white-space: nowrap;
+          transition: all var(--duration-fast) ease;
         }
-        .filter-pill:hover {
+
+        .filter-btn:hover {
+          color: var(--text-primary);
           background: var(--bg-hover);
         }
-        .filter-pill.active {
-          background: var(--text-main);
+
+        .filter-btn.active {
+          background: var(--text-primary);
           color: var(--text-inverse);
-          border-color: var(--text-main);
+          border-color: var(--text-primary);
         }
-        .completion-banner {
+
+        .filter-count {
+          font-size: 0.65rem;
+          opacity: 0.7;
+        }
+
+        /* Thin Progress Rail */
+        .log-progress-rail {
+          width: 100%;
+          height: 3px;
+          background: var(--bg-surface-sunken);
+          border-radius: var(--radius-none);
+          overflow: hidden;
+        }
+
+        .log-progress-fill {
+          height: 100%;
+          background: var(--accent);
+          transition: width var(--duration-normal) var(--ease-tactile);
+        }
+
+        /* 2. Milestone Banner */
+        .milestone-banner {
           display: flex;
           align-items: center;
-          gap: 14px;
-          background: var(--accent-light);
-          border: 1px solid var(--accent-border);
-          border-radius: var(--radius-md);
-          padding: 1.1rem 1.4rem;
-          color: var(--text-main);
+          padding: 1.1rem 1.35rem;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-left: 3px solid var(--accent);
+          border-radius: var(--radius-sm);
+          box-shadow: var(--shadow-sm);
         }
-        .sparkle-icon {
-          color: var(--accent-primary);
-          flex-shrink: 0;
+
+        .milestone-content {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
         }
-        .banner-title {
-          font-family: var(--font-heading);
+
+        .milestone-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 0.675rem;
           font-weight: 700;
-          font-size: 1rem;
+          letter-spacing: 0.08em;
+          color: var(--accent);
         }
-        .banner-subtitle {
+
+        .milestone-title {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 1.35rem;
+          font-weight: 400;
+          color: var(--text-primary);
+          line-height: 1.25;
+        }
+
+        .milestone-subtitle {
           font-size: 0.85rem;
           color: var(--text-secondary);
         }
-        .task-list {
+
+        /* 3. Structured Ledger Surface */
+        .ledger-surface {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          box-shadow: var(--shadow-sm);
         }
-        .empty-state {
+
+        .ledger-table {
           display: flex;
           flex-direction: column;
+        }
+
+        .ledger-entry {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.85rem 1.15rem;
+          border-bottom: 1px solid var(--border-subtle);
+          background: var(--bg-surface);
+          gap: 12px;
+          transition: background-color var(--duration-fast) ease;
+        }
+
+        .ledger-entry:last-child {
+          border-bottom: 1px solid var(--border);
+        }
+
+        .ledger-entry:hover {
+          background: #FAF8F5;
+        }
+
+        .ledger-entry.completed {
+          background: #F9F7F4;
+          opacity: 0.72;
+        }
+
+        /* Status & Checkbox Cell */
+        .entry-status-cell {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          flex-shrink: 0;
+        }
+
+        .entry-index {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          color: var(--text-faint);
+          width: 18px;
+        }
+
+        .priority-pip {
+          width: 5px;
+          height: 5px;
+          border-radius: 0;
+          flex-shrink: 0;
+        }
+
+        /* Primary Body Cell */
+        .entry-body-cell {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .entry-title-wrap {
+          cursor: pointer;
+        }
+
+        .entry-title-text {
+          font-size: 0.9375rem;
+          font-weight: 500;
+          color: var(--text-primary);
+          line-height: 1.4;
+          word-break: break-word;
+          transition: color var(--duration-fast) ease;
+        }
+
+        .ledger-entry.completed .entry-title-text {
+          color: var(--text-muted);
+          text-decoration: line-through;
+          text-decoration-color: var(--text-faint);
+          text-decoration-thickness: 1.5px;
+        }
+
+        /* In-place Inline Edit */
+        .inline-edit-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          width: 100%;
+        }
+
+        .inline-edit-input {
+          flex: 1;
+          padding: 4px 8px !important;
+          font-size: 0.875rem !important;
+          border-radius: var(--radius-xs) !important;
+        }
+
+        .inline-edit-actions {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .btn-edit-action {
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 3.5rem 1rem;
-          text-align: center;
+          width: 26px;
+          height: 26px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xs);
+          background: var(--bg-surface);
+          cursor: pointer;
+        }
+
+        .btn-edit-action.save {
+          color: var(--success);
+        }
+
+        .btn-edit-action.cancel {
+          color: var(--text-muted);
+        }
+
+        /* Metadata & Controls Cell */
+        .entry-meta-cell {
+          display: flex;
+          align-items: center;
           gap: 8px;
+          flex-shrink: 0;
         }
-        .empty-icon {
-          color: var(--accent-primary);
-          opacity: 0.85;
-          margin-bottom: 4px;
+
+        .time-stamp {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-family: var(--font-mono);
+          font-size: 0.725rem;
+          color: var(--text-muted);
         }
+
+        .stamp-icon {
+          color: var(--text-faint);
+        }
+
+        .entry-action-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          background: transparent;
+          border: none;
+          color: var(--text-faint);
+          border-radius: var(--radius-xs);
+          cursor: pointer;
+          transition: all var(--duration-fast) ease;
+        }
+
+        .ledger-entry:hover .entry-action-btn {
+          color: var(--text-muted);
+        }
+
+        .entry-action-btn:hover {
+          color: var(--text-primary);
+          background: var(--bg-hover);
+        }
+
+        .entry-action-btn.delete:hover {
+          color: var(--danger);
+          background: var(--danger-light);
+        }
+
+        /* Empty State */
+        .empty-ledger {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 3rem 1.75rem;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .empty-glyph {
+          color: var(--text-faint);
+          flex-shrink: 0;
+        }
+
+        .empty-content {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+        }
+
         .empty-title {
           font-family: var(--font-heading);
-          font-weight: 700;
-          font-size: 1.1rem;
-          color: var(--text-main);
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: var(--text-primary);
         }
-        .empty-text {
-          font-size: 0.875rem;
+
+        .empty-desc {
+          font-size: 0.85rem;
           color: var(--text-muted);
         }
-        .task-meta {
+
+        /* 4. Integrated Entry Composer */
+        .entry-composer-area {
+          background: var(--bg-surface);
+        }
+
+        .composer-trigger {
           display: flex;
           align-items: center;
-          gap: 8px;
-        }
-        .time-tag {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          font-weight: 500;
-        }
-        .btn-start-focus {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          background: rgba(46, 160, 67, 0.15);
-          border: 1px solid var(--accent-border);
-          color: var(--accent-primary);
-          padding: 3px 10px;
-          border-radius: var(--radius-pill);
-          font-family: var(--font-heading);
-          font-size: 0.75rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .btn-start-focus:hover {
-          background: var(--accent-secondary);
-          color: white;
-          box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .delete-btn {
-          background: transparent;
-          border: none;
-          color: var(--text-muted);
-          cursor: pointer;
-          padding: 4px;
-          border-radius: 6px;
-          opacity: 0;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-        }
-        .task-item:hover .delete-btn {
-          opacity: 0.7;
-        }
-        .delete-btn:hover {
-          opacity: 1 !important;
-          color: var(--badge-coral-text);
-          background: var(--badge-coral-bg);
-        }
-        .add-task-trigger {
-          display: flex;
-          align-items: center;
-          justify-content: center;
           gap: 8px;
           width: 100%;
-          padding: 0.95rem;
-          background: rgba(22, 27, 34, 0.35);
-          backdrop-filter: blur(16px);
-          border: 1px dashed rgba(255, 255, 255, 0.15);
-          border-radius: var(--radius-md);
+          padding: 0.95rem 1.15rem;
+          background: transparent;
+          border: none;
           font-family: var(--font-heading);
-          font-size: 0.925rem;
-          font-weight: 600;
-          color: var(--text-secondary);
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: var(--text-muted);
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
         }
-        .add-task-trigger:hover {
-          background: var(--bg-surface);
-          border-color: var(--accent-primary);
-          color: var(--accent-primary);
+
+        .composer-trigger:hover {
+          background: var(--bg-subtle);
+          color: var(--text-primary);
         }
-        .add-task-card {
-          padding: 1.25rem;
+
+        .trigger-icon {
+          color: var(--accent);
+        }
+
+        .trigger-hint {
+          margin-left: auto;
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          color: var(--text-faint);
+        }
+
+        /* Active Composer Form */
+        .composer-form {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          padding: 1.15rem;
+          gap: 0.85rem;
+          background: var(--bg-subtle);
         }
-        .add-task-input {
+
+        .composer-input-row {
           width: 100%;
-          border: none;
-          outline: none;
-          font-family: var(--font-body);
-          font-size: 1rem;
-          font-weight: 500;
-          background: transparent;
-          color: var(--text-main);
         }
-        .duration-picker-row {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          flex-wrap: wrap;
-          padding: 8px 0;
-          border-top: var(--border-light);
+
+        .composer-primary-input {
+          width: 100%;
+          border: 1px solid var(--border) !important;
+          background: var(--bg-surface) !important;
+          padding: 9px 12px !important;
+          font-family: var(--font-body) !important;
+          font-size: 0.95rem !important;
+          border-radius: var(--radius-sm) !important;
         }
-        .picker-label {
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: var(--text-muted);
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-        .duration-pills {
-          display: flex;
-          gap: 5px;
-          flex-wrap: wrap;
-        }
-        .dur-pill {
-          background: rgba(30, 36, 48, 0.6);
-          border: var(--border-glass);
-          color: var(--text-secondary);
-          padding: 3px 10px;
-          border-radius: var(--radius-pill);
-          font-family: var(--font-heading);
-          font-size: 0.775rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .dur-pill:hover {
-          background: var(--bg-hover);
-          color: var(--text-main);
-        }
-        .dur-pill.active {
-          background: var(--accent-secondary);
-          color: white;
-          border-color: var(--accent-primary);
-          box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .add-task-options {
+
+        .composer-controls-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
-          gap: 12px;
-          padding-top: 8px;
-          border-top: var(--border-light);
+          gap: 10px;
         }
-        .selectors-group {
+
+        .controls-left {
           display: flex;
           align-items: center;
           gap: 8px;
+          flex-wrap: wrap;
         }
-        .category-select, .time-input {
-          padding: 5px 12px;
-          border-radius: var(--radius-pill);
-          border: var(--border-glass);
-          background: rgba(30, 36, 48, 0.8);
-          font-family: var(--font-body);
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: var(--text-main);
-          outline: none;
-          color-scheme: dark;
+
+        .picker-label {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          color: var(--text-muted);
+          text-transform: uppercase;
         }
-        .category-select option {
-          background-color: #161B22 !important;
-          color: #E6EDF3 !important;
+
+        .duration-segmented {
+          display: flex;
+          gap: 3px;
         }
-        .time-input {
-          width: 70px;
+
+        .custom-duration-input {
+          width: 54px !important;
+          padding: 3px 6px !important;
+          font-family: var(--font-mono) !important;
+          font-size: 0.75rem !important;
           text-align: center;
         }
-        .action-buttons {
-          display: flex;
-          gap: 8px;
-        }
-        .btn-primary {
-          background: var(--accent-secondary);
-          color: white;
-          border: none;
-          padding: 7px 16px;
-          border-radius: var(--radius-pill);
-          font-family: var(--font-heading);
-          font-size: 0.85rem;
-          font-weight: 600;
-          cursor: pointer;
+
+        .controls-right {
           display: flex;
           align-items: center;
-          gap: 4px;
-          box-shadow: 0 4px 12px var(--accent-glow);
-          transition: all 0.2s ease;
+          gap: 8px;
+          flex-wrap: wrap;
         }
-        .btn-primary:hover {
-          background: var(--accent-primary);
+
+        .select-control {
+          padding: 4px 8px !important;
+          font-family: var(--font-mono) !important;
+          font-size: 0.775rem !important;
         }
-        .btn-secondary {
-          background: transparent;
-          color: var(--text-secondary);
-          border: none;
-          padding: 7px 14px;
-          border-radius: var(--radius-pill);
-          font-family: var(--font-heading);
-          font-size: 0.85rem;
-          font-weight: 500;
-          cursor: pointer;
+
+        .composer-actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
-        .btn-secondary:hover {
-          color: var(--text-main);
-          background: var(--bg-hover);
+
+        /* Responsive Layout Adjustments */
+        @media (max-width: 680px) {
+          .ledger-entry {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.85rem 1rem;
+            gap: 8px;
+          }
+
+          .entry-status-cell {
+            width: 100%;
+          }
+
+          .entry-body-cell {
+            width: 100%;
+            padding-left: 27px; /* Align flush with title under checkbox */
+          }
+
+          .entry-meta-cell {
+            width: 100%;
+            padding-left: 27px;
+            justify-content: space-between;
+            padding-top: 4px;
+            border-top: 1px dashed var(--border-subtle);
+          }
+
+          .composer-controls-row {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .controls-right {
+            width: 100%;
+            justify-content: space-between;
+          }
         }
       `}</style>
     </div>
