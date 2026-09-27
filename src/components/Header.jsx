@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { getDailyAtmosphere, getAtmosphereGreeting } from '../utils/atmosphere';
-import { Calendar, Trophy, Flame, Sparkles, Clock } from 'lucide-react';
+import { Calendar, Trophy, Flame } from 'lucide-react';
 
 export default function Header() {
   const { user, currentLevel, totalProductiveDays } = useApp();
-  const [greeting, setGreeting] = useState('');
-  const [atmosphere, setAtmosphere] = useState(getDailyAtmosphere());
 
-  // Live ticking date + time indicator (e.g. "Sunday, August 30 · 9:14 PM")
+  // Derived greeting directly from user profile & current atmosphere
+  const greeting = getAtmosphereGreeting(user.name);
+  const [atmosphere, setAtmosphere] = useState(() => getDailyAtmosphere());
+
+  // Live ticking date + time indicator (e.g. "Sun, Aug 30 · 9:14 PM")
   const [liveTimeString, setLiveTimeString] = useState(() => {
     const now = new Date();
     const datePart = now.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
+      weekday: 'short',
+      month: 'short',
       day: 'numeric',
     });
     const timePart = now.toLocaleTimeString('en-US', {
@@ -25,14 +27,11 @@ export default function Header() {
   });
 
   useEffect(() => {
-    setGreeting(getAtmosphereGreeting(user.name));
-    setAtmosphere(getDailyAtmosphere());
-
     const timer = setInterval(() => {
       const now = new Date();
       const datePart = now.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
+        weekday: 'short',
+        month: 'short',
         day: 'numeric',
       });
       const timePart = now.toLocaleTimeString('en-US', {
@@ -45,160 +44,268 @@ export default function Header() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [user.name]);
+  }, []);
 
   const displayLevel = currentLevel < 10 ? `0${currentLevel}` : `${currentLevel}`;
+  const userInitial = user.avatar || (user.name ? user.name.charAt(0).toUpperCase() : 'M');
 
   return (
-    <header className="hero-header">
-      {/* Top Brand, Live Time & Atmosphere Bar */}
-      <div className="brand-bar">
-        <div className="logo-group">
-          <div className="logo-icon-wrap">
-            <Sparkles size={16} className="logo-sparkle" />
+    <header className="workspace-header">
+      {/* Top Utilitarian Console Masthead */}
+      <div className="console-masthead">
+        {/* Left: Brand & Console Context */}
+        <div className="masthead-left">
+          <div className="brand-identity">
+            <span className="brand-stamp" aria-hidden="true">M</span>
+            <span className="brand-name">MOMENTUM</span>
           </div>
-          <span className="logo-text">MOMENTUM</span>
-          <span className="logo-dot">•</span>
-          
-          {/* Live Ticking Time Indicator Chip */}
-          <div className="date-chip">
-            <Calendar size={13} className="date-icon" />
+          <span className="masthead-divider" aria-hidden="true">/</span>
+          <span className="masthead-tag">WORK CONSOLE</span>
+        </div>
+
+        {/* Center: Live Time & Atmosphere Telemetry */}
+        <div className="masthead-center">
+          <div className="time-chip" title="Live system clock">
+            <Calendar size={12} className="meta-icon" />
             <span>{liveTimeString}</span>
           </div>
 
-          {/* Subtly Styled Atmosphere Badge */}
-          <div className={`atmosphere-chip period-${atmosphere.period}`}>
-            <span>{atmosphere.iconSymbol}</span>
+          <div className={`atmosphere-chip period-${atmosphere.period}`} title="Current time-of-day focus state">
+            <span className="period-sym">{atmosphere.iconSymbol}</span>
             <span>{atmosphere.label}</span>
           </div>
         </div>
 
-        {/* User Stats Badges */}
-        <div className="header-badges">
-          <div className="header-badge level-badge">
-            <Trophy size={13} className="badge-icon" />
-            <span>Lvl {displayLevel}</span>
+        {/* Right: User Statistics & Profile Stamp */}
+        <div className="masthead-right">
+          <div className="telemetry-badge level" title={`Experience Level ${currentLevel}`}>
+            <Trophy size={12} className="badge-icon" />
+            <span>LVL {displayLevel}</span>
           </div>
+
           {totalProductiveDays > 0 && (
-            <div className="header-badge streak-badge">
-              <Flame size={13} className="badge-icon orange" />
-              <span>{totalProductiveDays}d</span>
+            <div className="telemetry-badge streak" title={`${totalProductiveDays} productive days streak`}>
+              <Flame size={12} className="badge-icon flame" />
+              <span>{totalProductiveDays}D</span>
             </div>
           )}
+
+          <div className="user-profile-stamp" title={`Workspace profile: ${user.name || 'Anonymous'}`}>
+            <span>{userInitial}</span>
+          </div>
         </div>
       </div>
 
-      {/* Claude-Style Minimalistic Greeting Hero */}
-      <div className="greeting-hero-card glass-card">
-        <h1 className="claude-greeting-text font-serif-italic">
+      {/* Editorial Greeting Header (Quiet, Integrated, Non-Floating) */}
+      <div className="editorial-banner">
+        <div className="editorial-meta-row">
+          <span className="editorial-eyebrow">
+            MOMENTUM CONSOLE · {atmosphere.label.toUpperCase()}
+          </span>
+        </div>
+        <h1 className="editorial-greeting">
           {greeting}
         </h1>
       </div>
 
       <style>{`
-        .hero-header {
+        .workspace-header {
           display: flex;
           flex-direction: column;
-          gap: 1.25rem;
+          gap: 1.5rem;
+          width: 100%;
         }
-        .brand-bar {
+
+        /* Top Utilitarian Masthead Bar */
+        .console-masthead {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 4px;
+          padding: 0.6rem 0.85rem;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
+          gap: 12px;
           flex-wrap: wrap;
-          gap: 10px;
         }
-        .logo-group {
+
+        .masthead-left {
           display: flex;
           align-items: center;
           gap: 8px;
-          flex-wrap: wrap;
         }
-        .logo-icon-wrap {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          background: var(--accent-light);
-          border: 1px solid var(--accent-border);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .logo-sparkle {
-          color: var(--accent-primary);
-        }
-        .logo-text {
-          font-family: var(--font-heading);
-          font-weight: 800;
-          font-size: 0.9rem;
-          letter-spacing: 0.12em;
-          color: var(--text-main);
-        }
-        .logo-dot {
-          color: var(--text-muted);
-          font-size: 0.8rem;
-        }
-        .date-chip {
+
+        .brand-identity {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 3px 10px;
-          border-radius: var(--radius-pill);
-          font-family: var(--font-body);
-          font-size: 0.775rem;
-          font-weight: 600;
-          color: var(--text-secondary);
         }
-        .date-icon {
-          color: var(--accent-primary);
+
+        .brand-stamp {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          background: var(--text-primary);
+          color: var(--text-inverse);
+          font-family: var(--font-mono);
+          font-size: 0.725rem;
+          font-weight: 700;
+          border-radius: var(--radius-xs);
+          line-height: 1;
         }
-        .header-badges {
+
+        .brand-name {
+          font-family: var(--font-heading);
+          font-size: 0.825rem;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          color: var(--text-primary);
+        }
+
+        .masthead-divider {
+          color: var(--border-base);
+          font-size: 0.75rem;
+          font-family: var(--font-mono);
+        }
+
+        .masthead-tag {
+          font-family: var(--font-mono);
+          font-size: 0.675rem;
+          font-weight: 500;
+          letter-spacing: 0.08em;
+          color: var(--text-muted);
+        }
+
+        .masthead-center {
           display: flex;
           align-items: center;
           gap: 8px;
         }
-        .header-badge {
+
+        .time-chip {
           display: inline-flex;
           align-items: center;
           gap: 5px;
-          padding: 4px 10px;
-          border-radius: var(--radius-pill);
-          font-size: 0.775rem;
+          font-family: var(--font-mono);
+          font-size: 0.725rem;
+          color: var(--text-secondary);
+          background: var(--bg-subtle);
+          border: 1px solid var(--border-subtle);
+          padding: 3px 8px;
+          border-radius: var(--radius-xs);
+        }
+
+        .meta-icon {
+          color: var(--text-muted);
+        }
+
+        .period-sym {
+          font-size: 0.75rem;
+          line-height: 1;
+        }
+
+        .masthead-right {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .telemetry-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 3px 7px;
+          border-radius: var(--radius-xs);
+          border: 1px solid var(--border);
+          background: var(--bg-subtle);
+          color: var(--text-secondary);
+        }
+
+        .telemetry-badge.level {
+          color: var(--text-primary);
+        }
+
+        .telemetry-badge.streak {
+          background: var(--accent-light);
+          color: var(--accent);
+          border-color: var(--accent-border);
+        }
+
+        .badge-icon.flame {
+          color: var(--accent);
+        }
+
+        .user-profile-stamp {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          background: var(--bg-subtle);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xs);
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
           font-weight: 700;
-          font-family: var(--font-heading);
+          color: var(--text-primary);
         }
-        .level-badge {
-          background: rgba(163, 113, 247, 0.15);
-          color: #BC8CFF;
-          border: 1px solid rgba(163, 113, 247, 0.35);
+
+        /* Integrated Editorial Greeting */
+        .editorial-banner {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          padding: 1.25rem 0.25rem 0.5rem 0.25rem;
+          border-bottom: 1px solid var(--border-subtle);
         }
-        .streak-badge {
-          background: rgba(249, 115, 22, 0.15);
-          color: #F97316;
-          border: 1px solid rgba(249, 115, 22, 0.35);
+
+        .editorial-meta-row {
+          display: flex;
+          align-items: center;
         }
-        .greeting-hero-card {
-          text-align: center;
-          padding: 2rem 1.75rem;
-          background: rgba(22, 27, 34, 0.55);
-          border: 1px solid rgba(255, 255, 255, 0.14);
+
+        .editorial-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 0.6875rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          color: var(--text-muted);
         }
-        .claude-greeting-text {
-          font-size: 2.1rem;
-          line-height: 1.25;
-          color: var(--text-main);
-          letter-spacing: -0.01em;
+
+        .editorial-greeting {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 2.25rem;
           font-weight: 400;
+          line-height: 1.2;
+          color: var(--text-primary);
+          letter-spacing: -0.01em;
         }
-        @media (max-width: 640px) {
-          .claude-greeting-text {
-            font-size: 1.6rem;
+
+        @media (max-width: 680px) {
+          .console-masthead {
+            padding: 0.5rem 0.65rem;
           }
-          .date-chip {
-            font-size: 0.725rem;
+          .masthead-center {
+            order: 3;
+            width: 100%;
+            justify-content: space-between;
+            padding-top: 6px;
+            border-top: 1px solid var(--border-subtle);
+          }
+          .editorial-greeting {
+            font-size: 1.75rem;
+          }
+          .masthead-tag {
+            display: none;
+          }
+          .masthead-divider {
+            display: none;
           }
         }
       `}</style>
