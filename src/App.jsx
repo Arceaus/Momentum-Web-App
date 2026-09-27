@@ -26,9 +26,11 @@ function AppContent() {
 
         {/* Main Tab View */}
         <main className="main-content">
-          {activeTab === 'today' && <TodayView />}
-          {activeTab === 'history' && <HistoryLogSection />}
-          {activeTab === 'settings' && <SettingsView />}
+          <div key={activeTab} className="workspace-tab-pane">
+            {activeTab === 'today' && <TodayView />}
+            {activeTab === 'history' && <HistoryLogSection />}
+            {activeTab === 'settings' && <SettingsView />}
+          </div>
         </main>
 
         {/* Level Progress Indicator */}
@@ -44,6 +46,20 @@ function AppContent() {
           flex-direction: column;
           gap: 1.5rem;
           min-height: 400px;
+        }
+        .workspace-tab-pane {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+          animation: tabFadeIn var(--duration-fast) ease-out;
+        }
+        @keyframes tabFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
       `}</style>
     </>

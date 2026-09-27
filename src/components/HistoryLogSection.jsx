@@ -436,6 +436,18 @@ export default function HistoryLogSection() {
           flex-direction: column;
           background: #FAF8F5;
           border-top: 1px solid var(--border-subtle);
+          animation: tableExpand var(--duration-fast) var(--ease-tactile);
+        }
+
+        @keyframes tableExpand {
+          from {
+            opacity: 0;
+            transform: translateY(-3px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .archive-task-row {

@@ -238,13 +238,17 @@ export function AppProvider({ children }) {
       const newLevel = Math.floor(newTotalXP / xpPerLevel);
 
       if (newLevel > currentLevel && nextCompleted) {
-        confetti({
-          particleCount: 120,
-          spread: 90,
-          origin: { y: 0.6 },
-          colors: ['#39D353', '#26A641', '#38BDF8', '#BC8CFF']
-        });
-        showToast(`🎉 Level Up! You reached Level 0${newLevel}!`, 'celebrate');
+        const prefersReduced = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!prefersReduced) {
+          confetti({
+            particleCount: 40,
+            spread: 50,
+            origin: { y: 0.6 },
+            colors: ['#C84B26', '#181715', '#8A857B', '#2B7A4B'],
+            disableForReducedMotion: true,
+          });
+        }
+        showToast(`Level Milestone: Reached Level 0${newLevel}`, 'celebrate');
       }
 
       return {

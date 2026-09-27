@@ -423,6 +423,7 @@ export default function GitHubContributionGraph() {
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
+          animation: modalSettle var(--duration-fast) var(--ease-tactile);
         }
 
         .inspector-header {

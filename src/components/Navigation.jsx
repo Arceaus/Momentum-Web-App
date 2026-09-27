@@ -127,6 +127,10 @@ export default function Navigation() {
           background: var(--bg-hover);
         }
 
+        .workspace-tab-btn:active {
+          transform: translateY(1px);
+        }
+
         .workspace-tab-btn.active {
           color: var(--text-primary);
           background: var(--bg-surface);
@@ -208,6 +212,10 @@ export default function Navigation() {
 
           .mobile-tab-btn:hover {
             color: var(--text-primary);
+          }
+
+          .mobile-tab-btn:active {
+            transform: scale(0.96);
           }
 
           .mobile-tab-btn.active {

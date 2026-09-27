@@ -158,12 +158,14 @@
   --tracking-mono: 0.05em;
 
   /* --------------------------------------------------------------------------
-     11. Restrained Motion Language
+     11. Restrained Motion Language (Calibrated & Precise)
      -------------------------------------------------------------------------- */
   --ease-tactile: cubic-bezier(0.16, 1, 0.3, 1);
-  --duration-instant: 80ms;
-  --duration-fast: 150ms;
-  --duration-normal: 220ms;
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --duration-instant: 75ms;   /* Button clicks, checkbox active state */
+  --duration-fast: 120ms;      /* Hover shifts, border updates, toggles */
+  --duration-normal: 180ms;    /* Progress rails, disclosures, settlers */
+  --duration-subtle: 220ms;    /* Screen view changes, modal fading */
 }
 
 /* ----------------------------------------------------------------------------
@@ -987,6 +989,17 @@ textarea:focus,
   to { opacity: 1; }
 }
 
+@keyframes modalSettle {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Warning & Avatar Circles (Subtle Utilitarian Geometry) */
 .warning-icon-wrap {
   width: 44px !important;
@@ -1077,7 +1090,7 @@ textarea:focus,
 @keyframes toastSlideUp {
   from {
     opacity: 0;
-    transform: translate(-50%, 8px);
+    transform: translate(-50%, 6px);
   }
   to {
     opacity: 1;
@@ -1098,13 +1111,13 @@ textarea:focus,
   border-radius: var(--radius-xs) !important;
   box-shadow: var(--shadow-sm) !important;
   pointer-events: none !important;
-  animation: xpSlideUp 0.65s ease-out forwards !important;
+  animation: xpSlideUp 0.45s var(--ease-tactile) forwards !important;
 }
 
 @keyframes xpSlideUp {
   0% {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(3px);
   }
   20% {
     opacity: 1;
@@ -1112,10 +1125,42 @@ textarea:focus,
   }
   80% {
     opacity: 1;
-    transform: translateY(-8px);
+    transform: translateY(-6px);
   }
   100% {
     opacity: 0;
-    transform: translateY(-12px);
+    transform: translateY(-10px);
+  }
+}
+
+/* ==========================================================================
+   Universal Tactile Micro-motion ("I clicked something")
+   ========================================================================== */
+
+button:active:not(:disabled),
+.btn-action-primary:active,
+.btn-action-secondary:active,
+.btn-action-danger:active,
+.workspace-tab-btn:active,
+.mobile-tab-btn:active,
+.filter-btn:active,
+.timer-control-btn:active,
+.entry-action-btn:active {
+  transform: translateY(1px);
+  transition: transform var(--duration-instant) ease;
+}
+
+/* ==========================================================================
+   Accessibility: Complete prefers-reduced-motion Enforcement
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

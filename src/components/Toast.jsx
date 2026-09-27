@@ -31,7 +31,7 @@ export default function Toast() {
           display: flex;
           align-items: center;
           gap: 8px;
-          animation: slideUpToast 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: slideUpToast var(--duration-fast) var(--ease-tactile);
           white-space: nowrap;
           pointer-events: none;
         }
@@ -59,11 +59,11 @@ export default function Toast() {
         @keyframes slideUpToast {
           from {
             opacity: 0;
-            transform: translate(-50%, 10px) scale(0.97);
+            transform: translate(-50%, 5px);
           }
           to {
             opacity: 1;
-            transform: translate(-50%, 0) scale(1);
+            transform: translate(-50%, 0);
           }
         }
 

@@ -171,6 +171,7 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           flex-direction: column;
           gap: 1.25rem;
           text-align: center;
+          animation: modalSettle var(--duration-fast) var(--ease-tactile);
         }
 
         /* Top Status Bar */
@@ -392,6 +393,10 @@ export default function FocusTimerModal({ task, onClose, onCompleteTask }) {
           cursor: pointer;
           transition: all var(--duration-fast) var(--ease-tactile);
           border: 1px solid var(--border);
+        }
+
+        .control-btn:active {
+          transform: translateY(1px);
         }
 
         .control-btn.secondary {

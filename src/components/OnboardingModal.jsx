@@ -115,7 +115,7 @@ export default function OnboardingModal() {
           justify-content: center;
           z-index: 2000;
           padding: 1.5rem;
-          animation: scrimFadeIn 0.25s ease-out;
+          animation: scrimFadeIn var(--duration-fast) ease-out;
         }
 
         .onboarding-document {
@@ -129,7 +129,7 @@ export default function OnboardingModal() {
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
-          animation: docSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: docSlideIn var(--duration-normal) var(--ease-tactile);
         }
 
         /* Masthead */
@@ -336,11 +336,11 @@ export default function OnboardingModal() {
         @keyframes docSlideIn {
           from {
             opacity: 0;
-            transform: translateY(12px) scale(0.985);
+            transform: translateY(4px);
           }
           to {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
           }
         }
 

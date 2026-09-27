@@ -51,6 +51,7 @@ export default function EarlyCompletionModal({ task, remainingMinutes, onConfirm
           border: 1px solid var(--border);
           border-radius: var(--radius-md);
           box-shadow: var(--shadow-modal);
+          animation: modalSettle var(--duration-fast) var(--ease-tactile);
         }
 
         .warning-icon-wrap {

@@ -715,7 +715,19 @@ export default function TodayView() {
           border-bottom: 1px solid var(--border-subtle);
           background: var(--bg-surface);
           gap: 12px;
-          transition: background-color var(--duration-fast) ease;
+          transition: background-color var(--duration-fast) ease, opacity var(--duration-fast) ease;
+          animation: taskInsert var(--duration-fast) var(--ease-tactile);
+        }
+
+        @keyframes taskInsert {
+          from {
+            opacity: 0;
+            transform: translateY(-3px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .ledger-entry:last-child {
@@ -944,6 +956,18 @@ export default function TodayView() {
           padding: 1.15rem;
           gap: 0.85rem;
           background: var(--bg-subtle);
+          animation: composerExpand var(--duration-fast) var(--ease-tactile);
+        }
+
+        @keyframes composerExpand {
+          from {
+            opacity: 0;
+            transform: translateY(-4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .composer-input-row {
