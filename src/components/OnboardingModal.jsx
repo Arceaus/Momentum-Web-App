@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Sparkles, ArrowRight, ShieldCheck, Lock } from 'lucide-react';
+import { ArrowRight, Lock } from 'lucide-react';
 
 export default function OnboardingModal() {
   const { user, onboardUser } = useApp();
@@ -14,198 +14,344 @@ export default function OnboardingModal() {
     onboardUser(nameInput.trim());
   };
 
-  const initialLetter = nameInput.trim() ? nameInput.trim().charAt(0).toUpperCase() : '?';
+  const initialLetter = nameInput.trim() ? nameInput.trim().charAt(0).toUpperCase() : '—';
 
   return (
-    <div className="onboarding-overlay">
-      <div className="onboarding-card glass-card">
-        {/* Top Floating Glow Avatar */}
-        <div className="onboarding-avatar-circle">
-          <span className="avatar-letter">{initialLetter}</span>
-        </div>
-        
-        <div className="onboarding-title-group">
-          <div className="security-tag">
-            <Lock size={12} /> PRIVATE DIGITAL WORKSPACE
+    <div className="onboarding-scrim">
+      <div className="onboarding-document">
+        {/* Top Protocol Header */}
+        <div className="onboarding-masthead">
+          <div className="protocol-badge">
+            <span className="mono-label">MOMENTUM // SYSTEM INITIALIZATION</span>
+            <span className="mono-spec">PROTOCOL 01</span>
           </div>
-          <h1 className="onboarding-title">Welcome to Momentum</h1>
-          <p className="onboarding-subtitle">
-            A serene, dark workspace with GitHub-style contribution tracking. Enter your name to get started.
+          <div className="onboarding-stamp">[{initialLetter}]</div>
+        </div>
+
+        {/* Philosophy Intro */}
+        <div className="philosophy-statement">
+          <h1 className="philosophy-title">
+            A personal system for getting work done and seeing your progress.
+          </h1>
+          <p className="philosophy-prose">
+            Designed without vanity metrics, algorithmic distractions, or external surveillance. Momentum functions as an intentional personal instrument: record your daily commitments, focus with calibrated clarity, and construct an archival record of your genuine output.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="onboarding-form">
-          <div className="input-group">
-            <label className="onboarding-label">What is your name?</label>
-            <input
-              type="text"
-              className="onboarding-input"
-              placeholder="e.g. Sarthak, Alex, Maya..."
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              autoFocus
-              required
-            />
+        {/* Three System Tenets */}
+        <div className="tenets-ledger">
+          <div className="tenet-row">
+            <span className="tenet-idx">01</span>
+            <div className="tenet-detail">
+              <span className="tenet-heading">Intentional Ledger</span>
+              <span className="tenet-text">Record what matters today. Strike through items as completed.</span>
+            </div>
           </div>
 
-          <button type="submit" className="onboarding-btn">
-            <span>Unlock Workspace</span>
-            <ArrowRight size={16} />
+          <div className="tenet-row">
+            <span className="tenet-idx">02</span>
+            <div className="tenet-detail">
+              <span className="tenet-heading">Calibrated Focus</span>
+              <span className="tenet-text">Single-task focus sessions paired with tactile auditory feedback.</span>
+            </div>
+          </div>
+
+          <div className="tenet-row">
+            <span className="tenet-idx">03</span>
+            <div className="tenet-detail">
+              <span className="tenet-heading">Private Archive</span>
+              <span className="tenet-text">52-week activity chronicles persisted locally in browser IndexedDB.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Operator Identity Form */}
+        <form onSubmit={handleSubmit} className="onboarding-form">
+          <div className="form-field-group">
+            <label className="field-label" htmlFor="onboarding-name">
+              Operator Identity / Callsign
+            </label>
+            <div className="input-with-stamp">
+              <input
+                id="onboarding-name"
+                type="text"
+                className="onboarding-input"
+                placeholder="Enter your name or handle..."
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                autoFocus
+                required
+              />
+              <div className="live-preview-chip">
+                [{initialLetter}]
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" className="onboarding-submit-btn">
+            <span>Initialize Workspace</span>
+            <ArrowRight size={15} />
           </button>
         </form>
 
-        <div className="onboarding-footer">
-          <ShieldCheck size={14} className="shield-icon" />
-          <span>Your data stays 100% private in your browser</span>
+        {/* Micro Guarantee Footer */}
+        <div className="onboarding-security-footer">
+          <div className="security-badge">
+            <Lock size={12} />
+            <span>100% CLIENT-SIDE INDEXEDDB PERSISTENCE · ZERO TELEMETRY</span>
+          </div>
         </div>
       </div>
 
       <style>{`
-        .onboarding-overlay {
+        .onboarding-scrim {
           position: fixed;
           inset: 0;
-          background: rgba(4, 8, 16, 0.88);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          background: rgba(24, 23, 21, 0.72);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 2000;
-          animation: fadeIn 0.3s ease;
-          padding: 1rem;
+          padding: 1.5rem;
+          animation: scrimFadeIn 0.25s ease-out;
         }
-        .onboarding-card {
-          max-width: 440px;
+
+        .onboarding-document {
+          max-width: 520px;
           width: 100%;
-          text-align: center;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-modal);
+          padding: 2.25rem 2.25rem;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          gap: 1.25rem;
-          padding: 2.75rem 2.25rem;
-          background: rgba(22, 27, 34, 0.75);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-          border-radius: var(--radius-lg);
+          gap: 1.5rem;
+          animation: docSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .onboarding-avatar-circle {
-          width: 64px;
-          height: 64px;
-          border-radius: 50%;
-          background: var(--accent-gradient);
-          color: white;
+
+        /* Masthead */
+        .onboarding-masthead {
           display: flex;
           align-items: center;
-          justify-content: center;
-          box-shadow: 0 0 24px var(--accent-glow);
-          margin-bottom: 4px;
-          transition: transform 0.2s var(--ease-spring);
+          justify-content: space-between;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border-subtle);
         }
-        .avatar-letter {
-          font-family: var(--font-heading);
-          font-weight: 800;
-          font-size: 1.65rem;
-        }
-        .onboarding-title-group {
+        .protocol-badge {
           display: flex;
-          flex-direction: column;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
+          flex-wrap: wrap;
         }
-        .security-tag {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
+        .mono-label {
+          font-family: var(--font-mono);
           font-size: 0.7rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          color: var(--accent-primary);
-          background: var(--accent-light);
-          padding: 3px 10px;
-          border-radius: var(--radius-pill);
-          border: 1px solid var(--accent-border);
-        }
-        .onboarding-title {
-          font-family: var(--font-heading);
-          font-size: 1.85rem;
-          font-weight: 700;
-          color: var(--text-main);
-          letter-spacing: -0.02em;
-        }
-        .onboarding-subtitle {
-          font-size: 0.875rem;
+          letter-spacing: var(--tracking-mono);
           color: var(--text-secondary);
-          line-height: 1.5;
+          font-weight: 600;
         }
-        .onboarding-form {
-          width: 100%;
+        .mono-spec {
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          color: var(--accent);
+          background: var(--accent-light);
+          border: 1px solid var(--accent-border);
+          padding: 1px 6px;
+          border-radius: var(--radius-xs);
+        }
+        .onboarding-stamp {
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          background: var(--bg-surface-sunken);
+          border: 1px solid var(--border);
+          padding: 3px 8px;
+          border-radius: var(--radius-xs);
+        }
+
+        /* Statement */
+        .philosophy-statement {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 0.6rem;
         }
-        .input-group {
+        .philosophy-title {
+          font-family: var(--font-display);
+          font-size: 1.85rem;
+          line-height: 1.25;
+          color: var(--text-primary);
+          font-weight: 400;
+          letter-spacing: -0.01em;
+          margin: 0;
+        }
+        .philosophy-prose {
+          font-family: var(--font-body);
+          font-size: 0.865rem;
+          color: var(--text-secondary);
+          line-height: 1.55;
+          margin: 0;
+        }
+
+        /* Tenets */
+        .tenets-ledger {
           display: flex;
           flex-direction: column;
-          gap: 6px;
-          text-align: left;
+          gap: 8px;
+          background: var(--bg-surface-sunken);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-sm);
+          padding: 10px 14px;
         }
-        .onboarding-label {
+        .tenet-row {
+          display: flex;
+          align-items: baseline;
+          gap: 10px;
+        }
+        .tenet-idx {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: var(--accent);
+          min-width: 18px;
+        }
+        .tenet-detail {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+        }
+        .tenet-heading {
+          font-family: var(--font-heading);
           font-size: 0.775rem;
           font-weight: 700;
+          letter-spacing: 0.02em;
+          color: var(--text-primary);
+        }
+        .tenet-text {
+          font-family: var(--font-body);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          line-height: 1.35;
+        }
+
+        /* Form */
+        .onboarding-form {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        .form-field-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .field-label {
+          font-family: var(--font-mono);
+          font-size: 0.725rem;
+          letter-spacing: var(--tracking-mono);
           color: var(--text-secondary);
           text-transform: uppercase;
-          letter-spacing: 0.06em;
+          font-weight: 600;
+        }
+        .input-with-stamp {
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
         .onboarding-input {
-          width: 100%;
-          padding: 13px 18px;
-          border-radius: var(--radius-md);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          background: rgba(30, 36, 48, 0.7);
+          flex: 1;
+          padding: 10px 14px;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
+          background: var(--bg-surface);
           font-family: var(--font-body);
-          font-size: 1.05rem;
-          color: var(--text-main);
+          font-size: 0.95rem;
+          color: var(--text-primary);
           outline: none;
-          text-align: center;
-          transition: all 0.25s ease;
+          transition: border-color var(--duration-fast) ease;
         }
         .onboarding-input:focus {
-          border-color: var(--accent-primary);
-          box-shadow: 0 0 16px var(--accent-glow);
-          background: rgba(35, 42, 56, 0.9);
+          border-color: var(--text-primary);
         }
-        .onboarding-btn {
-          width: 100%;
-          padding: 13px;
-          border-radius: var(--radius-pill);
-          border: none;
-          background: var(--accent-secondary);
-          color: white;
-          font-family: var(--font-heading);
-          font-size: 0.975rem;
+        .live-preview-chip {
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
           font-weight: 700;
+          color: var(--accent);
+          background: var(--accent-light);
+          border: 1px solid var(--accent-border);
+          padding: 8px 12px;
+          border-radius: var(--radius-sm);
+          min-width: 44px;
+          text-align: center;
+        }
+
+        .onboarding-submit-btn {
+          width: 100%;
+          background: var(--text-primary);
+          color: var(--text-inverse);
+          border: 1px solid var(--text-primary);
+          padding: 11px 18px;
+          border-radius: var(--radius-sm);
+          font-family: var(--font-heading);
+          font-size: 0.875rem;
+          font-weight: 600;
+          letter-spacing: 0.02em;
           cursor: pointer;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          box-shadow: 0 4px 18px var(--accent-glow);
-          transition: all 0.25s var(--ease-spring);
+          transition: opacity var(--duration-fast) ease, transform var(--duration-fast) ease;
         }
-        .onboarding-btn:hover {
-          background: var(--accent-primary);
+        .onboarding-submit-btn:hover {
+          opacity: 0.92;
           transform: translateY(-1px);
         }
-        .onboarding-footer {
+
+        /* Micro Security */
+        .onboarding-security-footer {
           display: flex;
           align-items: center;
-          gap: 6px;
-          font-size: 0.775rem;
-          color: var(--text-muted);
-          margin-top: 4px;
+          justify-content: center;
+          padding-top: 4px;
         }
-        .shield-icon {
-          color: var(--accent-primary);
+        .security-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          letter-spacing: 0.04em;
+          color: var(--text-muted);
+        }
+
+        @keyframes scrimFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes docSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @media (max-width: 600px) {
+          .onboarding-document {
+            padding: 1.5rem 1.25rem;
+            gap: 1.25rem;
+          }
+          .philosophy-title {
+            font-size: 1.55rem;
+          }
         }
       `}</style>
     </div>
