@@ -1,4 +1,4 @@
-// Daily Atmosphere Engine - Subtle time-of-day personality generator
+// Daily Atmosphere Engine - Quiet, editorial time-of-day contextual generator
 
 export function getDailyAtmosphere() {
   const hour = new Date().getHours();
@@ -8,70 +8,62 @@ export function getDailyAtmosphere() {
     return {
       period: 'morning',
       label: 'Morning Clarity',
-      iconSymbol: '☀️',
-      accentColor: '#F59E0B',
-      accentGlow: 'rgba(245, 158, 11, 0.15)',
-      glowGradient: 'radial-gradient(circle at 50% -10%, rgba(245, 158, 11, 0.12) 0%, rgba(251, 191, 36, 0.04) 45%, transparent 70%)',
+      iconSymbol: '☀',
+      accentColor: '#B37418',
       badgeClass: 'atmosphere-morning',
       greetings: [
-        "Good morning, {name}. A fresh start awaits.",
+        "Good morning, {name}. A clear focus slate awaits.",
         "Morning focus, {name}.",
-        "Rise and build momentum, {name}.",
+        "Early session open, {name}.",
         "Clear morning mind, {name}.",
-        "A peaceful morning to focus, {name}."
+        "Quiet morning hours, {name}."
       ]
     };
   } else if (hour >= 12 && hour < 17) {
-    // ◐ Afternoon (12:00 PM - 4:59 PM)
+    // ● Afternoon (12:00 PM - 4:59 PM)
     return {
       period: 'afternoon',
-      label: 'Afternoon Flow',
-      iconSymbol: '◐',
-      accentColor: '#38BDF8',
-      accentGlow: 'rgba(56, 189, 248, 0.15)',
-      glowGradient: 'radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.12) 0%, rgba(14, 165, 233, 0.04) 45%, transparent 70%)',
+      label: 'Afternoon Progression',
+      iconSymbol: '●',
+      accentColor: '#C84B26',
       badgeClass: 'atmosphere-afternoon',
       greetings: [
-        "Good afternoon, {name}. Keep your momentum going.",
-        "Peak flow state, {name}.",
-        "Steady progress this afternoon, {name}.",
-        "Sustaining focus, {name}.",
+        "Good afternoon, {name}. Steady focus.",
+        "Afternoon progression, {name}.",
+        "Continuing today's ledger, {name}.",
+        "Sustained focus, {name}.",
         "Afternoon clarity, {name}."
       ]
     };
   } else if (hour >= 17 && hour < 21) {
-    // 🌆 Evening (5:00 PM - 8:59 PM)
+    // ◈ Evening (5:00 PM - 8:59 PM)
     return {
       period: 'evening',
-      label: 'Evening Unwind',
-      iconSymbol: '🌆',
-      accentColor: '#A855F7',
-      accentGlow: 'rgba(168, 85, 247, 0.15)',
-      glowGradient: 'radial-gradient(circle at 50% -10%, rgba(168, 85, 247, 0.12) 0%, rgba(236, 72, 153, 0.04) 45%, transparent 70%)',
+      label: 'Evening Review',
+      iconSymbol: '◈',
+      accentColor: '#5C5850',
       badgeClass: 'atmosphere-evening',
       greetings: [
-        "Good evening, {name}. Reflect on today's progress.",
-        "Unwinding momentum, {name}.",
-        "Golden hour focus, {name}.",
-        "Closing out the day strong, {name}.",
-        "Evening quietude, {name}."
+        "Good evening, {name}. Reviewing today's progress.",
+        "Evening archive open, {name}.",
+        "Quiet evening hours, {name}.",
+        "Closing out the day's commitments, {name}.",
+        "Evening reflection, {name}."
       ]
     };
   } else {
     // ☾ Night (9:00 PM - 4:59 AM)
     return {
       period: 'night',
-      label: 'Night Sanctuary',
+      label: 'Night Session',
       iconSymbol: '☾',
-      accentColor: '#6366F1',
-      accentGlow: 'rgba(99, 102, 241, 0.15)',
-      glowGradient: 'radial-gradient(circle at 50% -10%, rgba(99, 102, 241, 0.12) 0%, rgba(57, 211, 83, 0.04) 45%, transparent 70%)',
+      accentColor: '#181715',
       badgeClass: 'atmosphere-night',
       greetings: [
-        "Late hours, {name}. Quiet focus in the dark.",
-        "Midnight mastery, {name}.",
-        "Sanctuary of focus, {name}.",
-        "Deep night flow, {name}.",
+        "Late hours, {name}. Unhurried focus.",
+        "Quiet night session, {name}.",
+        "Focused solitude, {name}.",
+        "Deep night focus, {name}.",
         "Silent momentum, {name}."
       ]
     };

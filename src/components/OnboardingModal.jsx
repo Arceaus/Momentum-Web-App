@@ -107,9 +107,7 @@ export default function OnboardingModal() {
         .onboarding-scrim {
           position: fixed;
           inset: 0;
-          background: rgba(24, 23, 21, 0.72);
-          backdrop-filter: blur(6px);
-          -webkit-backdrop-filter: blur(6px);
+          background: rgba(24, 23, 21, 0.65);
           display: flex;
           align-items: center;
           justify-content: center;

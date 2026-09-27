@@ -25,5 +25,5 @@ export const DEFAULT_SETTINGS = {
   soundPreset: 'chime',
   customSoundUri: null,
   customSoundName: null,
-  accentTheme: 'mint',
+  accentTheme: 'light',
 };
