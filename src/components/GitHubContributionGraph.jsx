@@ -373,7 +373,7 @@ export default function GitHubContributionGraph() {
           z-index: 2;
         }
 
-        .gh-square.lvl-0 { background-color: var(--gh-0, #161b22) !important; }
+        .gh-square.lvl-0 { background-color: var(--gh-0, #292724) !important; }
         .gh-square.lvl-1 { background-color: var(--gh-1, #0e4429) !important; }
         .gh-square.lvl-2 { background-color: var(--gh-2, #006d32) !important; }
         .gh-square.lvl-3 { background-color: var(--gh-3, #26a641) !important; }

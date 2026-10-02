@@ -72,7 +72,7 @@
   /* --------------------------------------------------------------------------
      6. Archival Contribution Ramp (GitHub Green Scale)
      -------------------------------------------------------------------------- */
-  --gh-0: #161b22;                  /* Zero activity: dark neutral */
+  --gh-0: #292724;                  /* Zero activity: neutral dark charcoal */
   --gh-1: #0e4429;                  /* Low activity: dark green */
   --gh-2: #006d32;                  /* Moderate activity: medium-dark green */
   --gh-3: #26a641;                  /* High activity: medium/light green */
@@ -202,7 +202,7 @@
   --accent-light: rgba(217, 93, 57, 0.15);
   --accent-border: rgba(217, 93, 57, 0.35);
 
-  --gh-0: #161b22;                  /* Zero activity: dark neutral */
+  --gh-0: #292724;                  /* Zero activity: neutral dark charcoal */
   --gh-1: #0e4429;                  /* Low activity: dark green */
   --gh-2: #006d32;                  /* Moderate activity: medium-dark green */
   --gh-3: #26a641;                  /* High activity: medium/light green */
