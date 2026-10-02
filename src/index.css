@@ -70,13 +70,13 @@
   --priority-low: var(--success);
 
   /* --------------------------------------------------------------------------
-     6. Archival Contribution Ramp (Ink Density Scale)
+     6. Archival Contribution Ramp (GitHub Green Scale)
      -------------------------------------------------------------------------- */
-  --gh-0: #EAE6DE;                  /* Blank paper cell */
-  --gh-1: #D5CEBE;                  /* Light graphite wash */
-  --gh-2: #A39B8B;                  /* Medium ink wash */
-  --gh-3: #565045;                  /* Heavy carbon wash */
-  --gh-4: #C84B26;                  /* Active vermilion mark */
+  --gh-0: #161b22;                  /* Zero activity: dark neutral */
+  --gh-1: #0e4429;                  /* Low activity: dark green */
+  --gh-2: #006d32;                  /* Moderate activity: medium-dark green */
+  --gh-3: #26a641;                  /* High activity: medium/light green */
+  --gh-4: #39d353;                  /* Peak activity: bright light green */
 
   /* --------------------------------------------------------------------------
      7. Category Badges (Utilitarian Editorial Inks)
@@ -202,11 +202,11 @@
   --accent-light: rgba(217, 93, 57, 0.15);
   --accent-border: rgba(217, 93, 57, 0.35);
 
-  --gh-0: #262421;
-  --gh-1: #3E3A33;
-  --gh-2: #655E53;
-  --gh-3: #968D7D;
-  --gh-4: #D95D39;
+  --gh-0: #161b22;                  /* Zero activity: dark neutral */
+  --gh-1: #0e4429;                  /* Low activity: dark green */
+  --gh-2: #006d32;                  /* Moderate activity: medium-dark green */
+  --gh-3: #26a641;                  /* High activity: medium/light green */
+  --gh-4: #39d353;                  /* Peak activity: bright light green */
 
   --badge-focus-bg: #2C221D;
   --badge-focus-text: #E5835F;

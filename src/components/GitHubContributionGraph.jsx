@@ -21,12 +21,12 @@ export default function GitHubContributionGraph() {
     const score = typeof rawEntry === 'object' ? (rawEntry.score || 0) : count * 30;
     const minutes = typeof rawEntry === 'object' ? (rawEntry.minutes || 0) : count * 20;
 
-    // Archival Effort Density Ranks (0 to 4)
+    // Archival Effort Density Ranks (0 to 4) - GitHub Green Scale
     let lvl = 0;
-    if (score >= 150) lvl = 4;      // Peak terracotta mark (2h+ deep focus or 5+ tasks)
-    else if (score >= 75) lvl = 3;  // Heavy carbon ink (~1.5h focus)
-    else if (score >= 35) lvl = 2;  // Medium graphite wash (~45m-1h focus)
-    else if (score >= 1) lvl = 1;   // Light graphite tint (1 task or ~20m focus)
+    if (score >= 150) lvl = 4;      // Peak bright green (2h+ deep focus or 5+ tasks)
+    else if (score >= 75) lvl = 3;  // High medium/light green (~1.5h focus)
+    else if (score >= 35) lvl = 2;  // Moderate medium-dark green (~45m-1h focus)
+    else if (score >= 1) lvl = 1;   // Low dark green (1 task or ~20m focus)
 
     daysArray.push({
       dateStr,
@@ -373,11 +373,11 @@ export default function GitHubContributionGraph() {
           z-index: 2;
         }
 
-        .gh-square.lvl-0 { background-color: var(--gh-0) !important; }
-        .gh-square.lvl-1 { background-color: var(--gh-1) !important; }
-        .gh-square.lvl-2 { background-color: var(--gh-2) !important; }
-        .gh-square.lvl-3 { background-color: var(--gh-3) !important; }
-        .gh-square.lvl-4 { background-color: var(--gh-4) !important; }
+        .gh-square.lvl-0 { background-color: var(--gh-0, #161b22) !important; }
+        .gh-square.lvl-1 { background-color: var(--gh-1, #0e4429) !important; }
+        .gh-square.lvl-2 { background-color: var(--gh-2, #006d32) !important; }
+        .gh-square.lvl-3 { background-color: var(--gh-3, #26a641) !important; }
+        .gh-square.lvl-4 { background-color: var(--gh-4, #39d353) !important; }
 
         /* Footer & Guidance */
         .chronicle-footer {
