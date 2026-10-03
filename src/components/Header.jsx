@@ -4,11 +4,12 @@ import { getDailyAtmosphere, getAtmosphereGreeting } from '../utils/atmosphere';
 import { Calendar, Trophy, Flame } from 'lucide-react';
 
 export default function Header() {
-  const { user, currentLevel, totalProductiveDays } = useApp();
+  const { user, currentLevel, totalProductiveDays, atmosphere: ctxAtmosphere } = useApp();
+  const [localAtmosphere, setLocalAtmosphere] = useState(() => getDailyAtmosphere());
+  const atmosphere = ctxAtmosphere || localAtmosphere;
 
   // Derived greeting directly from user profile & current atmosphere
   const greeting = getAtmosphereGreeting(user.name);
-  const [atmosphere, setAtmosphere] = useState(() => getDailyAtmosphere());
 
   // Live ticking date + time indicator (e.g. "Sun, Aug 30 · 9:14 PM")
   const [liveTimeString, setLiveTimeString] = useState(() => {
@@ -40,7 +41,7 @@ export default function Header() {
         hour12: true,
       });
       setLiveTimeString(`${datePart} · ${timePart}`);
-      setAtmosphere(getDailyAtmosphere());
+      setLocalAtmosphere(getDailyAtmosphere());
     }, 1000);
 
     return () => clearInterval(timer);
@@ -92,7 +93,27 @@ export default function Header() {
 
       {/* Editorial Greeting Header */}
       <div className="editorial-banner">
-        <span className="editorial-eyebrow">{atmosphere.label}</span>
+        <span
+          className="editorial-eyebrow"
+          title={`Atmosphere: ${atmosphere.label} · Click to preview daylight transition`}
+          onClick={() => {
+            const periods = ['morning', 'afternoon', 'evening', 'night'];
+            const nextIdx = (periods.indexOf(atmosphere.period) + 1) % periods.length;
+            window.__setAtmosphere?.(periods[nextIdx]);
+          }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              const periods = ['morning', 'afternoon', 'evening', 'night'];
+              const nextIdx = (periods.indexOf(atmosphere.period) + 1) % periods.length;
+              window.__setAtmosphere?.(periods[nextIdx]);
+            }
+          }}
+          style={{ cursor: 'pointer', userSelect: 'none' }}
+        >
+          {atmosphere.label}
+        </span>
         <h1 className="editorial-greeting">
           {greeting}
         </h1>

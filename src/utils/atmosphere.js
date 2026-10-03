@@ -1,7 +1,15 @@
 // Daily Atmosphere Engine - Clean, editorial time-of-day contextual generator
 
 export function getDailyAtmosphere() {
-  const hour = new Date().getHours();
+  let hour = new Date().getHours();
+
+  if (typeof window !== 'undefined' && window.__momentumAtmospherePeriodOverride) {
+    const override = window.__momentumAtmospherePeriodOverride;
+    if (override === 'morning') hour = 9;
+    else if (override === 'afternoon') hour = 14;
+    else if (override === 'evening') hour = 19;
+    else if (override === 'night') hour = 23;
+  }
 
   if (hour >= 5 && hour < 12) {
     // Morning (5:00 AM - 11:59 AM)

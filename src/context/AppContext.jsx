@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { generateSeedActivityLog, INITIAL_TASKS, INITIAL_HISTORY_LOG, DEFAULT_USER, DEFAULT_SETTINGS } from '../utils/seedData';
+import { getDailyAtmosphere } from '../utils/atmosphere';
 import { playCompletionSound } from '../utils/audio';
 import { dbSet, dbClear } from '../utils/db';
 import confetti from 'canvas-confetti';
@@ -60,6 +61,7 @@ export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState('today');
   const [xpPops, setXpPops] = useState([]);
   const [toast, setToast] = useState(null);
+  const [atmosphere, setAtmosphere] = useState(() => getDailyAtmosphere());
 
   // Apply Theme Attribute
   useEffect(() => {
@@ -69,6 +71,36 @@ export function AppProvider({ children }) {
       document.documentElement.removeAttribute('data-theme');
     }
   }, [settings.accentTheme]);
+
+  // Synchronize Living Time-of-Day Atmosphere Attribute
+  useEffect(() => {
+    document.documentElement.setAttribute('data-atmosphere', atmosphere.period);
+
+    const timer = setInterval(() => {
+      const current = getDailyAtmosphere();
+      setAtmosphere((prev) => {
+        if (prev.period !== current.period) {
+          document.documentElement.setAttribute('data-atmosphere', current.period);
+          return current;
+        }
+        return prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [atmosphere.period]);
+
+  // Dev & Manual Testing Helper on window
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.__setAtmosphere = (period) => {
+        window.__momentumAtmospherePeriodOverride = period;
+        const current = getDailyAtmosphere();
+        setAtmosphere(current);
+        document.documentElement.setAttribute('data-atmosphere', current.period);
+      };
+    }
+  }, []);
 
   // Dual Sync to LocalStorage & High-Performance IndexedDB Database
   useEffect(() => {
@@ -379,6 +411,8 @@ export function AppProvider({ children }) {
         updateUser,
         resetData,
         showToast,
+        atmosphere,
+        setAtmosphere,
       }}
     >
       {children}

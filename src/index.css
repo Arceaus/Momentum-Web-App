@@ -16,6 +16,12 @@
   --bg-hover: #ECE8E0;              /* Interactive hover state */
   --bg-active: #E2DDD3;             /* Tactile pressed click state */
 
+  /* Atmospheric Lighting Tokens (Subtle Environmental Time-of-Day Wash) */
+  --atmosphere-app: var(--bg-app);
+  --atmosphere-surface: var(--bg-surface);
+  --atmosphere-surface-sunken: var(--bg-surface-sunken);
+  --atmosphere-subtle: var(--bg-subtle);
+
   /* --------------------------------------------------------------------------
      2. Text & Carbon Ink Hierarchy
      -------------------------------------------------------------------------- */
@@ -181,6 +187,12 @@
   --bg-hover: #2E2B27;
   --bg-active: #38342F;
 
+  /* Atmospheric Lighting Tokens (Subtle Environmental Time-of-Day Wash) */
+  --atmosphere-app: #181716;
+  --atmosphere-surface: #22201D;
+  --atmosphere-surface-sunken: #141312;
+  --atmosphere-subtle: #262421;
+
   --text-primary: #F0ECE1;
   --text-main: #F0ECE1;
   --text-secondary: #ADA79B;
@@ -239,6 +251,102 @@
 }
 
 /* ==========================================================================
+   TIME-OF-DAY ATMOSPHERIC LIGHTING SYSTEM
+   Quiet, restrained natural lighting shift across the drafting workspace
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Light Mode Atmosphere Tunings (Natural Vellum & Paper Lighting)
+   -------------------------------------------------------------------------- */
+[data-atmosphere="morning"] {
+  --atmosphere-app: #FBF9F5;
+  --atmosphere-surface-sunken: #F3EFE9;
+  --atmosphere-subtle: #F6F3EC;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+[data-atmosphere="afternoon"] {
+  --atmosphere-app: #F7F5F0;
+  --atmosphere-surface-sunken: #EFECE6;
+  --atmosphere-subtle: #F2EFE9;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+[data-atmosphere="evening"] {
+  --atmosphere-app: #F4EFE6;
+  --atmosphere-surface-sunken: #EBE4D8;
+  --atmosphere-subtle: #EFE8DC;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+[data-atmosphere="night"] {
+  --atmosphere-app: #EFEBE4;
+  --atmosphere-surface-sunken: #E5DFD5;
+  --atmosphere-subtle: #E9E3D9;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   Dark Mode Atmosphere Tunings (Primary Architectural Drafting Slate Experience)
+   -------------------------------------------------------------------------- */
+
+/* Afternoon (12:00–16:59): Base Reference Slate / Maximum Working Clarity */
+[data-theme="dark"][data-atmosphere="afternoon"],
+[data-theme="dark"] [data-atmosphere="afternoon"] {
+  --atmosphere-app: #181716;
+  --atmosphere-surface: #22201D;
+  --atmosphere-surface-sunken: #141312;
+  --atmosphere-subtle: #262421;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+/* Morning (05:00–11:59): Lifted, warm amber-charcoal study daylight */
+[data-theme="dark"][data-atmosphere="morning"],
+[data-theme="dark"] [data-atmosphere="morning"] {
+  --atmosphere-app: #1D1B19;
+  --atmosphere-surface: #252320;
+  --atmosphere-surface-sunken: #181615;
+  --atmosphere-subtle: #2A2724;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+/* Evening (17:00–20:59): Richer, warmer, deeper sepia-charcoal dusk */
+[data-theme="dark"][data-atmosphere="evening"],
+[data-theme="dark"] [data-atmosphere="evening"] {
+  --atmosphere-app: #191614;
+  --atmosphere-surface: #231E1B;
+  --atmosphere-surface-sunken: #13110F;
+  --atmosphere-subtle: #27221E;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+/* Night (21:00–04:59): Deepest, quietest, focused warm-black under a desk lamp */
+[data-theme="dark"][data-atmosphere="night"],
+[data-theme="dark"] [data-atmosphere="night"] {
+  --atmosphere-app: #131211;
+  --atmosphere-surface: #1E1D1B;
+  --atmosphere-surface-sunken: #0E0D0D;
+  --atmosphere-subtle: #201F1D;
+  --bg-app: var(--atmosphere-app);
+  --bg-surface-sunken: var(--atmosphere-surface-sunken);
+  --bg-subtle: var(--atmosphere-subtle);
+}
+
+/* ==========================================================================
    Base Resets & Canvas Setup
    ========================================================================== */
 
@@ -257,7 +365,7 @@ html {
 html, body {
   width: 100%;
   min-height: 100vh;
-  background-color: var(--bg-app);
+  background-color: var(--atmosphere-app, var(--bg-app));
   color: var(--text-primary);
   font-family: var(--font-body);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -265,6 +373,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   overflow-x: hidden;
+  transition: background-color 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 #root {
@@ -641,6 +750,7 @@ button {
   background: var(--bg-surface-sunken) !important;
   border: 1px solid var(--border) !important;
   padding: 2px !important;
+  transition: background-color 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .toggle-switch.active {
@@ -973,6 +1083,7 @@ textarea:focus,
   border-radius: var(--radius-xs) !important;
   overflow: hidden !important;
   position: relative !important;
+  transition: background-color 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .progress-fill,
