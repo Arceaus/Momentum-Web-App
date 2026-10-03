@@ -21,12 +21,12 @@ export default function GitHubContributionGraph() {
     const score = typeof rawEntry === 'object' ? (rawEntry.score || 0) : count * 30;
     const minutes = typeof rawEntry === 'object' ? (rawEntry.minutes || 0) : count * 20;
 
-    // Conservative Effort Density Ranks (0 to 4)
+    // Hours-Based Intensity Levels (0 to 4) based ONLY on focused minutes
     let lvl = 0;
-    if (score >= 500) lvl = 4;      // Level 4: Exceptional / huge effort (500+ effort)
-    else if (score >= 250) lvl = 3;  // Level 3: Very productive day (250–499 effort)
-    else if (score >= 100) lvl = 2;  // Level 2: Good work (100–249 effort)
-    else if (score >= 1) lvl = 1;   // Level 1: Normal work / small effort (1–99 effort)
+    if (minutes >= 600) lvl = 4;      // Level 4: 600+ focused minutes (10+ hours)
+    else if (minutes >= 360) lvl = 3;  // Level 3: 360–599 focused minutes (6–10 hours)
+    else if (minutes >= 180) lvl = 2;  // Level 2: 180–359 focused minutes (3–6 hours)
+    else if (minutes >= 1) lvl = 1;   // Level 1: 1–179 focused minutes (0–3 hours)
 
     daysArray.push({
       dateStr,
