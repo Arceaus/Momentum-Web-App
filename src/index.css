@@ -72,11 +72,11 @@
   /* --------------------------------------------------------------------------
      6. Archival Contribution Ramp (GitHub Green Scale)
      -------------------------------------------------------------------------- */
-  --gh-0: #292724;                  /* Zero activity: neutral dark charcoal */
-  --gh-1: #0e4429;                  /* Low activity: dark green */
-  --gh-2: #006d32;                  /* Moderate activity: medium-dark green */
-  --gh-3: #26a641;                  /* High activity: medium/light green */
-  --gh-4: #39d353;                  /* Peak activity: bright light green */
+  --gh-0: #292724;                  /* Zero activity: neutral charcoal */
+  --gh-1: #0e4429;                  /* Low activity: dark green (1-99 effort) */
+  --gh-2: #006d32;                  /* Moderate activity: medium green (100-249 effort) */
+  --gh-3: #26a641;                  /* High activity: bright green (250-499 effort) */
+  --gh-4: #4ade80;                  /* Peak activity: very bright vivid green (500+ effort) */
 
   /* --------------------------------------------------------------------------
      7. Category Badges (Utilitarian Editorial Inks)
@@ -202,11 +202,11 @@
   --accent-light: rgba(217, 93, 57, 0.15);
   --accent-border: rgba(217, 93, 57, 0.35);
 
-  --gh-0: #292724;                  /* Zero activity: neutral dark charcoal */
-  --gh-1: #0e4429;                  /* Low activity: dark green */
-  --gh-2: #006d32;                  /* Moderate activity: medium-dark green */
-  --gh-3: #26a641;                  /* High activity: medium/light green */
-  --gh-4: #39d353;                  /* Peak activity: bright light green */
+  --gh-0: #292724;                  /* Zero activity: neutral charcoal */
+  --gh-1: #0e4429;                  /* Low activity: dark green (1-99 effort) */
+  --gh-2: #006d32;                  /* Moderate activity: medium green (100-249 effort) */
+  --gh-3: #26a641;                  /* High activity: bright green (250-499 effort) */
+  --gh-4: #4ade80;                  /* Peak activity: very bright vivid green (500+ effort) */
 
   --badge-focus-bg: #2C221D;
   --badge-focus-text: #E5835F;

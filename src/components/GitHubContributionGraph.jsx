@@ -21,12 +21,12 @@ export default function GitHubContributionGraph() {
     const score = typeof rawEntry === 'object' ? (rawEntry.score || 0) : count * 30;
     const minutes = typeof rawEntry === 'object' ? (rawEntry.minutes || 0) : count * 20;
 
-    // Archival Effort Density Ranks (0 to 4) - GitHub Green Scale
+    // Conservative Effort Density Ranks (0 to 4)
     let lvl = 0;
-    if (score >= 150) lvl = 4;      // Peak bright green (2h+ deep focus or 5+ tasks)
-    else if (score >= 75) lvl = 3;  // High medium/light green (~1.5h focus)
-    else if (score >= 35) lvl = 2;  // Moderate medium-dark green (~45m-1h focus)
-    else if (score >= 1) lvl = 1;   // Low dark green (1 task or ~20m focus)
+    if (score >= 500) lvl = 4;      // Level 4: Exceptional / huge effort (500+ effort)
+    else if (score >= 250) lvl = 3;  // Level 3: Very productive day (250–499 effort)
+    else if (score >= 100) lvl = 2;  // Level 2: Good work (100–249 effort)
+    else if (score >= 1) lvl = 1;   // Level 1: Normal work / small effort (1–99 effort)
 
     daysArray.push({
       dateStr,
@@ -377,7 +377,7 @@ export default function GitHubContributionGraph() {
         .gh-square.lvl-1 { background-color: var(--gh-1, #0e4429) !important; }
         .gh-square.lvl-2 { background-color: var(--gh-2, #006d32) !important; }
         .gh-square.lvl-3 { background-color: var(--gh-3, #26a641) !important; }
-        .gh-square.lvl-4 { background-color: var(--gh-4, #39d353) !important; }
+        .gh-square.lvl-4 { background-color: var(--gh-4, #4ade80) !important; }
 
         /* Footer & Guidance */
         .chronicle-footer {
